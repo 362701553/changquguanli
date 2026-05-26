@@ -1,0 +1,33 @@
+/* 全局变量 */
+
+/*通用轮廓 大小*/
+/*右侧的主框架大小*/
+.zhudiv {
+  /*border: 1px solid #99a9bf;*/
+  width: 97%;
+  height: 680px;
+  margin: 0px auto;
+  margin-top:30px;
+}
+
+
+
+/*div浮动*/
+.youfd{
+  float: right;
+}
+
+
+
+
+/*浮动距离多少*/
+/*左*/
+.fdzuo {
+  margin-left: 80px;
+}
+
+
+/*上*/
+.fdshang {
+  margin-top:15px;
+}

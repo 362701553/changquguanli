@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FAppointmentTaskMapper">
+    
+    <resultMap type="FAppointmentTask" id="FAppointmentTaskResult">
+        <result property="id"    column="id"    />
+        <result property="factoryId"    column="factory_id"    />
+        <result property="factoryName"    column="factory_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateDate"    column="update_date"    />
+        <result property="taskCode"    column="task_code"    />
+        <result property="factoryAreaId"    column="factory_area_id"    />
+        <result property="factoryAreaName"    column="factory_area_name"    />
+        <result property="categoryMainCode"    column="category_main_code"    />
+        <result property="categorySubCode"    column="category_sub_code"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="categorySubName"    column="category_sub_name"    />
+        <result property="businessLiaisonById"    column="business_liaison_by_id"    />
+        <result property="businessLiaisonByRel"    column="business_liaison_by_rel"    />
+        <result property="businessLiaisonBy"    column="business_liaison_by"    />
+        <result property="serviceProviderId"    column="service_provider_id"    />
+        <result property="serviceProviderName"    column="service_provider_name"    />
+        <result property="carId"    column="car_id"    />
+        <result property="carNo"    column="car_no"    />
+        <result property="transportPallets"    column="transport_pallets"    />
+        <result property="outDriverId"    column="out_driver_id"    />
+        <result property="outDriverName"    column="out_driver_name"    />
+        <result property="outDriverPhone"    column="out_driver_phone"    />
+        <result property="taskStatus"    column="task_status"    />
+        <result property="expectWaitTime"    column="expect_wait_time"    />
+        <result property="checkinGateId"    column="checkin_gate_id"    />
+        <result property="checkinGateName"    column="checkin_gate_name"    />
+        <result property="planCheckinTime"    column="plan_checkin_time"    />
+        <result property="actualCheckinTime"    column="actual_checkin_time"    />
+        <result property="planCheckoutTime"    column="plan_checkout_time"    />
+        <result property="actualCheckoutTime"    column="actual_checkout_time"    />
+        <result property="checkoutGateId"    column="checkout_gate_id"    />
+        <result property="checkoutGateName"    column="checkout_gate_name"    />
+        <result property="appointmentStart"    column="appointment_start"    />
+        <result property="appointmentEnd"    column="appointment_end"    />
+        <result property="appointmentTime"    column="appointment_time"    />
+        <result property="auditStatus"    column="audit_status"    />
+        <result property="auditor"    column="auditor"    />
+        <result property="auditTime"    column="audit_time"    />
+        <result property="auditRejectReason"    column="audit_reject_reason"    />
+        <result property="allowJump"    column="allow_jump"    />
+        <result property="jumpReason"    column="jump_reason"    />
+        <result property="jumpOperator"    column="jump_operator"    />
+        <result property="jumpTime"    column="jump_time"    />
+        <result property="exitNo"    column="exit_no"    />
+        <result property="gateId"    column="gate_id"    />
+        <result property="gateName"    column="gate_name"    />
+        <result property="expectDriverArriveTime"    column="expect_driver_arrive_time"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceSn"    column="device_sn"    />
+        <result property="bindDeviceStatus"    column="bind_device_status"    />
+        <result property="startPoint"    column="start_point"    />
+        <result property="destinationPoint"    column="destination_point"    />
+        <result property="planTimeDetailId"    column="plan_time_detail_id"    />
+        <result property="currentDockId"    column="current_dock_id"    />
+        <result property="currentDockName"    column="current_dock_name"    />
+        <result property="bindTime"    column="bind_time"    />
+        <result property="isEmergency"    column="is_emergency"    />
+        <result property="isForceStop"    column="is_force_stop"    />
+        <result property="remark"    column="remark"    />
+        <result property="reviewNotes"    column="review_notes"    />
+    </resultMap>
+
+    <sql id="selectFAppointmentTaskVo">
+        select id, factory_id, factory_name, dept_id, deleted, create_by, create_date, update_by, update_date, task_code, factory_area_id, factory_area_name, category_main_code, category_sub_code, category_name, category_sub_name, business_liaison_by_id, business_liaison_by_rel, business_liaison_by, service_provider_id, service_provider_name, car_id, car_no, transport_pallets, out_driver_id, out_driver_name, out_driver_phone, task_status, expect_wait_time, checkin_gate_id, checkin_gate_name, plan_checkin_time, actual_checkin_time, plan_checkout_time, actual_checkout_time, checkout_gate_id, checkout_gate_name, appointment_start, appointment_end, appointment_time, audit_status, auditor, audit_time, audit_reject_reason, allow_jump, jump_reason, jump_operator, jump_time, exit_no, gate_id, gate_name, expect_driver_arrive_time, device_id, device_sn, bind_device_status, start_point, destination_point, plan_time_detail_id, current_dock_id, current_dock_name, bind_time, is_emergency, is_force_stop, remark, review_notes from f_appointment_task
+    </sql>
+
+    <select id="selectFAppointmentTaskList" parameterType="FAppointmentTask" resultMap="FAppointmentTaskResult">
+        <include refid="selectFAppointmentTaskVo"/>
+        <where>  
+            <if test="factoryId != null "> and factory_id = #{factoryId}</if>
+            <if test="factoryName != null  and factoryName != ''"> and factory_name like concat('%', #{factoryName}, '%')</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="deleted != null "> and deleted = #{deleted}</if>
+            <if test="createDate != null "> and create_date = #{createDate}</if>
+            <if test="updateDate != null "> and update_date = #{updateDate}</if>
+            <if test="taskCode != null  and taskCode != ''"> and task_code = #{taskCode}</if>
+            <if test="factoryAreaId != null "> and factory_area_id = #{factoryAreaId}</if>
+            <if test="factoryAreaName != null  and factoryAreaName != ''"> and factory_area_name like concat('%', #{factoryAreaName}, '%')</if>
+            <if test="categoryMainCode != null  and categoryMainCode != ''"> and category_main_code = #{categoryMainCode}</if>
+            <if test="categorySubCode != null  and categorySubCode != ''"> and category_sub_code = #{categorySubCode}</if>
+            <if test="categoryName != null  and categoryName != ''"> and category_name like concat('%', #{categoryName}, '%')</if>
+            <if test="categorySubName != null  and categorySubName != ''"> and category_sub_name like concat('%', #{categorySubName}, '%')</if>
+            <if test="businessLiaisonById != null  and businessLiaisonById != ''"> and business_liaison_by_id = #{businessLiaisonById}</if>
+            <if test="businessLiaisonByRel != null  and businessLiaisonByRel != ''"> and business_liaison_by_rel = #{businessLiaisonByRel}</if>
+            <if test="businessLiaisonBy != null  and businessLiaisonBy != ''"> and business_liaison_by = #{businessLiaisonBy}</if>
+            <if test="serviceProviderId != null "> and service_provider_id = #{serviceProviderId}</if>
+            <if test="serviceProviderName != null  and serviceProviderName != ''"> and service_provider_name like concat('%', #{serviceProviderName}, '%')</if>
+            <if test="carId != null "> and car_id = #{carId}</if>
+            <if test="carNo != null  and carNo != ''"> and car_no = #{carNo}</if>
+            <if test="transportPallets != null "> and transport_pallets = #{transportPallets}</if>
+            <if test="outDriverId != null "> and out_driver_id = #{outDriverId}</if>
+            <if test="outDriverName != null  and outDriverName != ''"> and out_driver_name like concat('%', #{outDriverName}, '%')</if>
+            <if test="outDriverPhone != null  and outDriverPhone != ''"> and out_driver_phone = #{outDriverPhone}</if>
+            <if test="taskStatus != null  and taskStatus != ''"> and task_status = #{taskStatus}</if>
+            <if test="expectWaitTime != null "> and expect_wait_time = #{expectWaitTime}</if>
+            <if test="checkinGateId != null "> and checkin_gate_id = #{checkinGateId}</if>
+            <if test="checkinGateName != null  and checkinGateName != ''"> and checkin_gate_name like concat('%', #{checkinGateName}, '%')</if>
+            <if test="planCheckinTime != null "> and plan_checkin_time = #{planCheckinTime}</if>
+            <if test="actualCheckinTime != null "> and actual_checkin_time = #{actualCheckinTime}</if>
+            <if test="planCheckoutTime != null "> and plan_checkout_time = #{planCheckoutTime}</if>
+            <if test="actualCheckoutTime != null "> and actual_checkout_time = #{actualCheckoutTime}</if>
+            <if test="checkoutGateId != null "> and checkout_gate_id = #{checkoutGateId}</if>
+            <if test="checkoutGateName != null  and checkoutGateName != ''"> and checkout_gate_name like concat('%', #{checkoutGateName}, '%')</if>
+            <if test="appointmentStart != null "> and appointment_start = #{appointmentStart}</if>
+            <if test="appointmentEnd != null "> and appointment_end = #{appointmentEnd}</if>
+            <if test="appointmentTime != null "> and appointment_time = #{appointmentTime}</if>
+            <if test="auditStatus != null  and auditStatus != ''"> and audit_status = #{auditStatus}</if>
+            <if test="auditor != null  and auditor != ''"> and auditor = #{auditor}</if>
+            <if test="auditTime != null "> and audit_time = #{auditTime}</if>
+            <if test="auditRejectReason != null  and auditRejectReason != ''"> and audit_reject_reason = #{auditRejectReason}</if>
+            <if test="allowJump != null  and allowJump != ''"> and allow_jump = #{allowJump}</if>
+            <if test="jumpReason != null  and jumpReason != ''"> and jump_reason = #{jumpReason}</if>
+            <if test="jumpOperator != null  and jumpOperator != ''"> and jump_operator = #{jumpOperator}</if>
+            <if test="jumpTime != null "> and jump_time = #{jumpTime}</if>
+            <if test="exitNo != null  and exitNo != ''"> and exit_no = #{exitNo}</if>
+            <if test="gateId != null "> and gate_id = #{gateId}</if>
+            <if test="gateName != null  and gateName != ''"> and gate_name like concat('%', #{gateName}, '%')</if>
+            <if test="expectDriverArriveTime != null "> and expect_driver_arrive_time = #{expectDriverArriveTime}</if>
+            <if test="deviceId != null "> and device_id = #{deviceId}</if>
+            <if test="deviceSn != null  and deviceSn != ''"> and device_sn = #{deviceSn}</if>
+            <if test="bindDeviceStatus != null  and bindDeviceStatus != ''"> and bind_device_status = #{bindDeviceStatus}</if>
+            <if test="startPoint != null  and startPoint != ''"> and start_point = #{startPoint}</if>
+            <if test="destinationPoint != null  and destinationPoint != ''"> and destination_point = #{destinationPoint}</if>
+            <if test="planTimeDetailId != null "> and plan_time_detail_id = #{planTimeDetailId}</if>
+            <if test="currentDockId != null "> and current_dock_id = #{currentDockId}</if>
+            <if test="currentDockName != null  and currentDockName != ''"> and current_dock_name like concat('%', #{currentDockName}, '%')</if>
+            <if test="bindTime != null "> and bind_time = #{bindTime}</if>
+            <if test="isEmergency != null  and isEmergency != ''"> and is_emergency = #{isEmergency}</if>
+            <if test="isForceStop != null  and isForceStop != ''"> and is_force_stop = #{isForceStop}</if>
+            <if test="reviewNotes != null  and reviewNotes != ''"> and review_notes = #{reviewNotes}</if>
+        </where>
+    </select>
+    
+    <select id="selectFAppointmentTaskById" parameterType="Long" resultMap="FAppointmentTaskResult">
+        <include refid="selectFAppointmentTaskVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertFAppointmentTask" parameterType="FAppointmentTask" useGeneratedKeys="true" keyProperty="id">
+        insert into f_appointment_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="factoryId != null">factory_id,</if>
+            <if test="factoryName != null">factory_name,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateDate != null">update_date,</if>
+            <if test="taskCode != null">task_code,</if>
+            <if test="factoryAreaId != null">factory_area_id,</if>
+            <if test="factoryAreaName != null">factory_area_name,</if>
+            <if test="categoryMainCode != null">category_main_code,</if>
+            <if test="categorySubCode != null">category_sub_code,</if>
+            <if test="categoryName != null">category_name,</if>
+            <if test="categorySubName != null">category_sub_name,</if>
+            <if test="businessLiaisonById != null">business_liaison_by_id,</if>
+            <if test="businessLiaisonByRel != null">business_liaison_by_rel,</if>
+            <if test="businessLiaisonBy != null">business_liaison_by,</if>
+            <if test="serviceProviderId != null">service_provider_id,</if>
+            <if test="serviceProviderName != null">service_provider_name,</if>
+            <if test="carId != null">car_id,</if>
+            <if test="carNo != null">car_no,</if>
+            <if test="transportPallets != null">transport_pallets,</if>
+            <if test="outDriverId != null">out_driver_id,</if>
+            <if test="outDriverName != null">out_driver_name,</if>
+            <if test="outDriverPhone != null">out_driver_phone,</if>
+            <if test="taskStatus != null">task_status,</if>
+            <if test="expectWaitTime != null">expect_wait_time,</if>
+            <if test="checkinGateId != null">checkin_gate_id,</if>
+            <if test="checkinGateName != null">checkin_gate_name,</if>
+            <if test="planCheckinTime != null">plan_checkin_time,</if>
+            <if test="actualCheckinTime != null">actual_checkin_time,</if>
+            <if test="planCheckoutTime != null">plan_checkout_time,</if>
+            <if test="actualCheckoutTime != null">actual_checkout_time,</if>
+            <if test="checkoutGateId != null">checkout_gate_id,</if>
+            <if test="checkoutGateName != null">checkout_gate_name,</if>
+            <if test="appointmentStart != null">appointment_start,</if>
+            <if test="appointmentEnd != null">appointment_end,</if>
+            <if test="appointmentTime != null">appointment_time,</if>
+            <if test="auditStatus != null">audit_status,</if>
+            <if test="auditor != null">auditor,</if>
+            <if test="auditTime != null">audit_time,</if>
+            <if test="auditRejectReason != null">audit_reject_reason,</if>
+            <if test="allowJump != null">allow_jump,</if>
+            <if test="jumpReason != null">jump_reason,</if>
+            <if test="jumpOperator != null">jump_operator,</if>
+            <if test="jumpTime != null">jump_time,</if>
+            <if test="exitNo != null">exit_no,</if>
+            <if test="gateId != null">gate_id,</if>
+            <if test="gateName != null">gate_name,</if>
+            <if test="expectDriverArriveTime != null">expect_driver_arrive_time,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="deviceSn != null">device_sn,</if>
+            <if test="bindDeviceStatus != null">bind_device_status,</if>
+            <if test="startPoint != null">start_point,</if>
+            <if test="destinationPoint != null">destination_point,</if>
+            <if test="planTimeDetailId != null">plan_time_detail_id,</if>
+            <if test="currentDockId != null">current_dock_id,</if>
+            <if test="currentDockName != null">current_dock_name,</if>
+            <if test="bindTime != null">bind_time,</if>
+            <if test="isEmergency != null">is_emergency,</if>
+            <if test="isForceStop != null">is_force_stop,</if>
+            <if test="remark != null">remark,</if>
+            <if test="reviewNotes != null">review_notes,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="factoryId != null">#{factoryId},</if>
+            <if test="factoryName != null">#{factoryName},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateDate != null">#{updateDate},</if>
+            <if test="taskCode != null">#{taskCode},</if>
+            <if test="factoryAreaId != null">#{factoryAreaId},</if>
+            <if test="factoryAreaName != null">#{factoryAreaName},</if>
+            <if test="categoryMainCode != null">#{categoryMainCode},</if>
+            <if test="categorySubCode != null">#{categorySubCode},</if>
+            <if test="categoryName != null">#{categoryName},</if>
+            <if test="categorySubName != null">#{categorySubName},</if>
+            <if test="businessLiaisonById != null">#{businessLiaisonById},</if>
+            <if test="businessLiaisonByRel != null">#{businessLiaisonByRel},</if>
+            <if test="businessLiaisonBy != null">#{businessLiaisonBy},</if>
+            <if test="serviceProviderId != null">#{serviceProviderId},</if>
+            <if test="serviceProviderName != null">#{serviceProviderName},</if>
+            <if test="carId != null">#{carId},</if>
+            <if test="carNo != null">#{carNo},</if>
+            <if test="transportPallets != null">#{transportPallets},</if>
+            <if test="outDriverId != null">#{outDriverId},</if>
+            <if test="outDriverName != null">#{outDriverName},</if>
+            <if test="outDriverPhone != null">#{outDriverPhone},</if>
+            <if test="taskStatus != null">#{taskStatus},</if>
+            <if test="expectWaitTime != null">#{expectWaitTime},</if>
+            <if test="checkinGateId != null">#{checkinGateId},</if>
+            <if test="checkinGateName != null">#{checkinGateName},</if>
+            <if test="planCheckinTime != null">#{planCheckinTime},</if>
+            <if test="actualCheckinTime != null">#{actualCheckinTime},</if>
+            <if test="planCheckoutTime != null">#{planCheckoutTime},</if>
+            <if test="actualCheckoutTime != null">#{actualCheckoutTime},</if>
+            <if test="checkoutGateId != null">#{checkoutGateId},</if>
+            <if test="checkoutGateName != null">#{checkoutGateName},</if>
+            <if test="appointmentStart != null">#{appointmentStart},</if>
+            <if test="appointmentEnd != null">#{appointmentEnd},</if>
+            <if test="appointmentTime != null">#{appointmentTime},</if>
+            <if test="auditStatus != null">#{auditStatus},</if>
+            <if test="auditor != null">#{auditor},</if>
+            <if test="auditTime != null">#{auditTime},</if>
+            <if test="auditRejectReason != null">#{auditRejectReason},</if>
+            <if test="allowJump != null">#{allowJump},</if>
+            <if test="jumpReason != null">#{jumpReason},</if>
+            <if test="jumpOperator != null">#{jumpOperator},</if>
+            <if test="jumpTime != null">#{jumpTime},</if>
+            <if test="exitNo != null">#{exitNo},</if>
+            <if test="gateId != null">#{gateId},</if>
+            <if test="gateName != null">#{gateName},</if>
+            <if test="expectDriverArriveTime != null">#{expectDriverArriveTime},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="deviceSn != null">#{deviceSn},</if>
+            <if test="bindDeviceStatus != null">#{bindDeviceStatus},</if>
+            <if test="startPoint != null">#{startPoint},</if>
+            <if test="destinationPoint != null">#{destinationPoint},</if>
+            <if test="planTimeDetailId != null">#{planTimeDetailId},</if>
+            <if test="currentDockId != null">#{currentDockId},</if>
+            <if test="currentDockName != null">#{currentDockName},</if>
+            <if test="bindTime != null">#{bindTime},</if>
+            <if test="isEmergency != null">#{isEmergency},</if>
+            <if test="isForceStop != null">#{isForceStop},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="reviewNotes != null">#{reviewNotes},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFAppointmentTask" parameterType="FAppointmentTask">
+        update f_appointment_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="factoryId != null">factory_id = #{factoryId},</if>
+            <if test="factoryName != null">factory_name = #{factoryName},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateDate != null">update_date = #{updateDate},</if>
+            <if test="taskCode != null">task_code = #{taskCode},</if>
+            <if test="factoryAreaId != null">factory_area_id = #{factoryAreaId},</if>
+            <if test="factoryAreaName != null">factory_area_name = #{factoryAreaName},</if>
+            <if test="categoryMainCode != null">category_main_code = #{categoryMainCode},</if>
+            <if test="categorySubCode != null">category_sub_code = #{categorySubCode},</if>
+            <if test="categoryName != null">category_name = #{categoryName},</if>
+            <if test="categorySubName != null">category_sub_name = #{categorySubName},</if>
+            <if test="businessLiaisonById != null">business_liaison_by_id = #{businessLiaisonById},</if>
+            <if test="businessLiaisonByRel != null">business_liaison_by_rel = #{businessLiaisonByRel},</if>
+            <if test="businessLiaisonBy != null">business_liaison_by = #{businessLiaisonBy},</if>
+            <if test="serviceProviderId != null">service_provider_id = #{serviceProviderId},</if>
+            <if test="serviceProviderName != null">service_provider_name = #{serviceProviderName},</if>
+            <if test="carId != null">car_id = #{carId},</if>
+            <if test="carNo != null">car_no = #{carNo},</if>
+            <if test="transportPallets != null">transport_pallets = #{transportPallets},</if>
+            <if test="outDriverId != null">out_driver_id = #{outDriverId},</if>
+            <if test="outDriverName != null">out_driver_name = #{outDriverName},</if>
+            <if test="outDriverPhone != null">out_driver_phone = #{outDriverPhone},</if>
+            <if test="taskStatus != null">task_status = #{taskStatus},</if>
+            <if test="expectWaitTime != null">expect_wait_time = #{expectWaitTime},</if>
+            <if test="checkinGateId != null">checkin_gate_id = #{checkinGateId},</if>
+            <if test="checkinGateName != null">checkin_gate_name = #{checkinGateName},</if>
+            <if test="planCheckinTime != null">plan_checkin_time = #{planCheckinTime},</if>
+            <if test="actualCheckinTime != null">actual_checkin_time = #{actualCheckinTime},</if>
+            <if test="planCheckoutTime != null">plan_checkout_time = #{planCheckoutTime},</if>
+            <if test="actualCheckoutTime != null">actual_checkout_time = #{actualCheckoutTime},</if>
+            <if test="checkoutGateId != null">checkout_gate_id = #{checkoutGateId},</if>
+            <if test="checkoutGateName != null">checkout_gate_name = #{checkoutGateName},</if>
+            <if test="appointmentStart != null">appointment_start = #{appointmentStart},</if>
+            <if test="appointmentEnd != null">appointment_end = #{appointmentEnd},</if>
+            <if test="appointmentTime != null">appointment_time = #{appointmentTime},</if>
+            <if test="auditStatus != null">audit_status = #{auditStatus},</if>
+            <if test="auditor != null">auditor = #{auditor},</if>
+            <if test="auditTime != null">audit_time = #{auditTime},</if>
+            <if test="auditRejectReason != null">audit_reject_reason = #{auditRejectReason},</if>
+            <if test="allowJump != null">allow_jump = #{allowJump},</if>
+            <if test="jumpReason != null">jump_reason = #{jumpReason},</if>
+            <if test="jumpOperator != null">jump_operator = #{jumpOperator},</if>
+            <if test="jumpTime != null">jump_time = #{jumpTime},</if>
+            <if test="exitNo != null">exit_no = #{exitNo},</if>
+            <if test="gateId != null">gate_id = #{gateId},</if>
+            <if test="gateName != null">gate_name = #{gateName},</if>
+            <if test="expectDriverArriveTime != null">expect_driver_arrive_time = #{expectDriverArriveTime},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="deviceSn != null">device_sn = #{deviceSn},</if>
+            <if test="bindDeviceStatus != null">bind_device_status = #{bindDeviceStatus},</if>
+            <if test="startPoint != null">start_point = #{startPoint},</if>
+            <if test="destinationPoint != null">destination_point = #{destinationPoint},</if>
+            <if test="planTimeDetailId != null">plan_time_detail_id = #{planTimeDetailId},</if>
+            <if test="currentDockId != null">current_dock_id = #{currentDockId},</if>
+            <if test="currentDockName != null">current_dock_name = #{currentDockName},</if>
+            <if test="bindTime != null">bind_time = #{bindTime},</if>
+            <if test="isEmergency != null">is_emergency = #{isEmergency},</if>
+            <if test="isForceStop != null">is_force_stop = #{isForceStop},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="reviewNotes != null">review_notes = #{reviewNotes},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFAppointmentTaskById" parameterType="Long">
+        delete from f_appointment_task where id = #{id}
+    </delete>
+
+    <delete id="deleteFAppointmentTaskByIds" parameterType="String">
+        delete from f_appointment_task where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

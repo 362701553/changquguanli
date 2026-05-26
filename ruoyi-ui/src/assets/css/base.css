@@ -1,0 +1,120 @@
+/* 全局变量 */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 字体 */
+.ziti {
+	font-size: 20px;
+}
+.ziti2 {
+	font-size:10px;
+}
+.ziti3 {
+	font-size: 5px;
+}
+
+/* 浮动 */
+.left {
+	float: left;
+}
+.right {
+	float: right;
+}
+.qingchu {
+	clear: both;
+}
+
+
+/* 距离上面多少 */
+.jushang {
+	margin-top:3px;
+}
+.jushang2 {
+	margin-top:20px;
+}
+.jushang3{
+	margin-top:50px;
+}
+
+/* 距离左边多少 */
+.zuo {
+	margin-left: 80px;
+}
+
+.zuo1 {
+	margin-left:20px;
+}
+.zuo2 {
+	margin-left:3px;
+}
+.zuo3 {
+	margin-left: 60px;
+}
+/* 距离右边多少 */
+.you3{
+	margin-right: 40px;
+}
+.you4{
+	margin-right:10px;
+}
+.you4{
+	margin-right:180px;
+}
+/* 距离下面距离 */
+.juxia{
+	margin-bottom: 20px;
+}
+.juxia2{
+	margin-bottom: 3px;
+}
+/* 超链接样式 */
+
+a {
+	text-decoration: none;
+	color: #1e90ff;
+	font-size:12px;
+}
+/* 行级元素 */
+.hang{
+	display: inline-block;
+}
+
+
+
+/* 通知公告等样式 左上角 */
+.tzggys{
+
+	border: 1px solid #99a9bf;
+	border-left: none;
+	border-right: none;
+	border-bottom: none;
+
+}
+/* 字体颜色 */
+.tzggys2{
+	color: #3399ff;
+}
+.txggys3{
+
+		margin-left: 100px;
+		margin-top: 15px;
+
+}
+.hauxian{
+	border: 1px solid #99a9bf;
+
+}
