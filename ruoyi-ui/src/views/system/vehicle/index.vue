@@ -1,34 +1,10 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="90px">
       <el-form-item label="司机姓名" prop="driverName">
         <el-input
           v-model="queryParams.driverName"
           placeholder="请输入司机姓名"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="名" prop="firstName">
-        <el-input
-          v-model="queryParams.firstName"
-          placeholder="请输入名"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="姓" prop="lastName">
-        <el-input
-          v-model="queryParams.lastName"
-          placeholder="请输入姓"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="国家" prop="country">
-        <el-input
-          v-model="queryParams.country"
-          placeholder="请输入国家"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -41,50 +17,10 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="身份证后四位" prop="idCardLastFour">
-        <el-input
-          v-model="queryParams.idCardLastFour"
-          placeholder="请输入身份证后四位"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="账号" prop="account">
         <el-input
           v-model="queryParams.account"
           placeholder="请输入账号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input
-          v-model="queryParams.password"
-          placeholder="请输入密码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="用户ID" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="删除状态：0-未删除，1-已删除" prop="deleted">
-        <el-input
-          v-model="queryParams.deleted"
-          placeholder="请输入删除状态：0-未删除，1-已删除"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="是否自动审核 1自动 0手动" prop="isAutoReview">
-        <el-input
-          v-model="queryParams.isAutoReview"
-          placeholder="请输入是否自动审核 1自动 0手动"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -151,10 +87,11 @@
       <el-table-column label="联系电话" align="center" prop="phone" />
       <el-table-column label="身份证后四位" align="center" prop="idCardLastFour" />
       <el-table-column label="账号" align="center" prop="account" />
-      <el-table-column label="密码" align="center" prop="password" />
-      <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="删除状态：0-未删除，1-已删除" align="center" prop="deleted" />
-      <el-table-column label="是否自动审核 1自动 0手动" align="center" prop="isAutoReview" />
+      <el-table-column label="自动审核" align="center" prop="isAutoReview">
+        <template slot-scope="scope">
+          <span>{{ scope.row.isAutoReview === 1 ? '自动' : '手动' }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -185,7 +122,7 @@
 
     <!-- 添加或修改车辆司机主对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="司机姓名" prop="driverName">
           <el-input v-model="form.driverName" placeholder="请输入司机姓名" />
         </el-form-item>
@@ -205,19 +142,16 @@
           <el-input v-model="form.idCardLastFour" placeholder="请输入身份证后四位" />
         </el-form-item>
         <el-form-item label="账号" prop="account">
-          <el-input v-model="form.account" placeholder="请输入账号" />
+          <el-input v-model="form.account" placeholder="不填则默认使用联系电话" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" placeholder="请输入密码" />
+          <el-input v-model="form.password" type="password" show-password :placeholder="form.id ? '不填则不修改密码' : '请输入登录密码'" />
         </el-form-item>
-        <el-form-item label="用户ID" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户ID" />
-        </el-form-item>
-        <el-form-item label="删除状态：0-未删除，1-已删除" prop="deleted">
-          <el-input v-model="form.deleted" placeholder="请输入删除状态：0-未删除，1-已删除" />
-        </el-form-item>
-        <el-form-item label="是否自动审核 1自动 0手动" prop="isAutoReview">
-          <el-input v-model="form.isAutoReview" placeholder="请输入是否自动审核 1自动 0手动" />
+        <el-form-item label="自动审核" prop="isAutoReview">
+          <el-select v-model="form.isAutoReview" placeholder="请选择">
+            <el-option label="自动" :value="1" />
+            <el-option label="手动" :value="0" />
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -258,21 +192,30 @@ export default {
         pageNum: 1,
         pageSize: 10,
         driverName: null,
-        firstName: null,
-        lastName: null,
-        country: null,
         phone: null,
-        idCardLastFour: null,
-        account: null,
-        password: null,
-        userId: null,
-        deleted: null,
-        isAutoReview: null
+        account: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
+        driverName: [
+          { required: true, message: "司机姓名不能为空", trigger: "blur" }
+        ],
+        phone: [
+          { required: true, message: "联系电话不能为空", trigger: "blur" }
+        ],
+        password: [
+          { required: true, message: "密码不能为空", trigger: "blur",
+            validator: (rule, value, callback) => {
+              if (!this.form.id && !value) {
+                callback(new Error("密码不能为空"));
+              } else {
+                callback();
+              }
+            }
+          }
+        ]
       }
     };
   },
