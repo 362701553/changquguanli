@@ -120,19 +120,19 @@
     />
 
     <!-- 添加或修改码头对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="180px" :disabled="isDetail">
+    <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="180px" :disabled="isDetail" class="dock-form">
         <el-form-item label="码头名称" prop="dockName">
-          <el-input v-model="form.dockName" placeholder="请输入码头名称" />
+          <el-input v-model="form.dockName" placeholder="请输入码头名称" style="width: 320px;" />
         </el-form-item>
         <el-form-item label="叉车每托货卸货时长(分钟)" prop="unloadingDuration">
-          <el-input-number v-model="form.unloadingDuration" :min="0" :precision="1" placeholder="请输入" />
+          <el-input-number v-model="form.unloadingDuration" :min="0" :precision="1" :controls="true" style="width: 320px;" />
         </el-form-item>
         <el-form-item label="叉车每托货装货时长(分钟)" prop="loadingDuration">
-          <el-input-number v-model="form.loadingDuration" :min="0" :precision="1" placeholder="请输入" />
+          <el-input-number v-model="form.loadingDuration" :min="0" :precision="1" :controls="true" style="width: 320px;" />
         </el-form-item>
         <el-form-item label="码头工作时间设置" prop="workDays">
-          <el-select v-model="form.workDaysList" multiple placeholder="请选择工作日">
+          <el-select v-model="form.workDaysList" multiple placeholder="请选择工作日" style="width: 320px;">
             <el-option label="周一" value="1" />
             <el-option label="周二" value="2" />
             <el-option label="周三" value="3" />
@@ -143,7 +143,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="有效状态" prop="status">
-          <el-select v-model="form.status" placeholder="请选择">
+          <el-select v-model="form.status" placeholder="请选择" style="width: 320px;">
             <el-option label="启用" :value="1" />
             <el-option label="停用" :value="0" />
           </el-select>
@@ -402,3 +402,15 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.dock-form .el-form-item {
+  margin-bottom: 18px;
+}
+.dock-form .el-input-number {
+  text-align: left;
+}
+.dock-form .el-input-number .el-input__inner {
+  text-align: left;
+}
+</style>

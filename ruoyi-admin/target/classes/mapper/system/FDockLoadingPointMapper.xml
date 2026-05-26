@@ -161,9 +161,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteFDockLoadingPointByIds" parameterType="String">
-        delete from f_dock_loading_point where id in 
+        delete from f_dock_loading_point where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
+    </delete>
+
+    <delete id="deleteFDockLoadingPointByDockId" parameterType="Long">
+        delete from f_dock_loading_point where dock_id = #{dockId}
     </delete>
 </mapper>

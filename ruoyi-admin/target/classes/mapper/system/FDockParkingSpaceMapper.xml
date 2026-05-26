@@ -131,9 +131,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteFDockParkingSpaceByIds" parameterType="String">
-        delete from f_dock_parking_space where id in 
+        delete from f_dock_parking_space where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
+    </delete>
+
+    <delete id="deleteFDockParkingSpaceByDockId" parameterType="Long">
+        delete from f_dock_parking_space where dock_id = #{dockId}
     </delete>
 </mapper>
