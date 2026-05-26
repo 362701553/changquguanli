@@ -1,309 +1,19 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="主表id" prop="taskId">
-        <el-input
-          v-model="queryParams.taskId"
-          placeholder="请输入主表id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="行号" prop="lineNo">
-        <el-input
-          v-model="queryParams.lineNo"
-          placeholder="请输入行号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="预约码头ID" prop="dockId">
-        <el-input
-          v-model="queryParams.dockId"
-          placeholder="请输入预约码头ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="预约码头名称" prop="dockName">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="90px">
+      <el-form-item label="码头名称" prop="dockName">
         <el-input
           v-model="queryParams.dockName"
-          placeholder="请输入预约码头名称"
+          placeholder="请输入码头名称"
           clearable
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="预约码头编码" prop="dockCode">
-        <el-input
-          v-model="queryParams.dockCode"
-          placeholder="请输入预约码头编码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="码头预约开始" prop="dockStart">
-        <el-date-picker clearable
-          v-model="queryParams.dockStart"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择码头预约开始">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="码头预约结束" prop="dockEnd">
-        <el-date-picker clearable
-          v-model="queryParams.dockEnd"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择码头预约结束">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="装卸点ID" prop="loadingPointId">
-        <el-input
-          v-model="queryParams.loadingPointId"
-          placeholder="请输入装卸点ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="装卸点编号" prop="loadingPointCode">
-        <el-input
-          v-model="queryParams.loadingPointCode"
-          placeholder="请输入装卸点编号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="装卸点名称" prop="loadingPointName">
-        <el-input
-          v-model="queryParams.loadingPointName"
-          placeholder="请输入装卸点名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="叉车司机ID(主要)" prop="forkliftDriverId">
-        <el-input
-          v-model="queryParams.forkliftDriverId"
-          placeholder="请输入叉车司机ID(主要)"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="叉车司机姓名" prop="forkliftDriverName">
-        <el-input
-          v-model="queryParams.forkliftDriverName"
-          placeholder="请输入叉车司机姓名"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="叉车编号" prop="forkliftNo">
-        <el-input
-          v-model="queryParams.forkliftNo"
-          placeholder="请输入叉车编号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="叉车其他人员" prop="forkliftExtra">
-        <el-input
-          v-model="queryParams.forkliftExtra"
-          placeholder="请输入叉车其他人员"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="装卸托数" prop="loadingQty">
-        <el-input
-          v-model="queryParams.loadingQty"
-          placeholder="请输入装卸托数"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="装卸开始时间" prop="loadingStart">
-        <el-date-picker clearable
-          v-model="queryParams.loadingStart"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择装卸开始时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="装卸完成时间" prop="loadingFinish">
-        <el-date-picker clearable
-          v-model="queryParams.loadingFinish"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择装卸完成时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="装卸点释放时间" prop="pointReleaseTime">
-        <el-date-picker clearable
-          v-model="queryParams.pointReleaseTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择装卸点释放时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="到达码头时间(撞栏)" prop="arriveTime">
-        <el-date-picker clearable
-          v-model="queryParams.arriveTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择到达码头时间(撞栏)">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="驶离码头时间" prop="leaveTime">
-        <el-date-picker clearable
-          v-model="queryParams.leaveTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择驶离码头时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="所属公司ID" prop="factoryId">
-        <el-input
-          v-model="queryParams.factoryId"
-          placeholder="请输入所属公司ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="所属公司名称" prop="factoryName">
-        <el-input
-          v-model="queryParams.factoryName"
-          placeholder="请输入所属公司名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="部门id" prop="deptId">
-        <el-input
-          v-model="queryParams.deptId"
-          placeholder="请输入部门id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="删除状态" prop="deleted">
-        <el-input
-          v-model="queryParams.deleted"
-          placeholder="请输入删除状态"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="创建时间" prop="createDate">
-        <el-date-picker clearable
-          v-model="queryParams.createDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择创建时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="修改时间" prop="updateDate">
-        <el-date-picker clearable
-          v-model="queryParams.updateDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择修改时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="时间明细ID" prop="planTimeDetailId">
-        <el-input
-          v-model="queryParams.planTimeDetailId"
-          placeholder="请输入时间明细ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="排队序号" prop="queueNumber">
-        <el-input
-          v-model="queryParams.queueNumber"
-          placeholder="请输入排队序号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="预计等待时间" prop="expectWaitTime">
-        <el-input
-          v-model="queryParams.expectWaitTime"
-          placeholder="请输入预计等待时间"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="是否作业完成插队" prop="isWorkedJump">
-        <el-input
-          v-model="queryParams.isWorkedJump"
-          placeholder="请输入是否作业完成插队"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="码头顺序" prop="dockSort">
-        <el-input
-          v-model="queryParams.dockSort"
-          placeholder="请输入码头顺序"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="停车位ID" prop="parkingId">
-        <el-input
-          v-model="queryParams.parkingId"
-          placeholder="请输入停车位ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="车型" prop="carModel">
-        <el-input
-          v-model="queryParams.carModel"
-          placeholder="请输入车型"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="停车位编码" prop="parkingCode">
-        <el-input
-          v-model="queryParams.parkingCode"
-          placeholder="请输入停车位编码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="装卸任务编码" prop="loadingTaskCode">
-        <el-input
-          v-model="queryParams.loadingTaskCode"
-          placeholder="请输入装卸任务编码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="厂区ID" prop="factoryAreaId">
-        <el-input
-          v-model="queryParams.factoryAreaId"
-          placeholder="请输入厂区ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="厂区名称" prop="factoryAreaName">
-        <el-input
-          v-model="queryParams.factoryAreaName"
-          placeholder="请输入厂区名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="厂区部门ID" prop="areaDeptId">
-        <el-input
-          v-model="queryParams.areaDeptId"
-          placeholder="请输入厂区部门ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="有效状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择" clearable>
+          <el-option label="启用" :value="1" />
+          <el-option label="停用" :value="0" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -359,86 +69,30 @@
 
     <el-table v-loading="loading" :data="dockList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="${comment}" align="center" prop="id" />
-      <el-table-column label="主表id" align="center" prop="taskId" />
-      <el-table-column label="行号" align="center" prop="lineNo" />
-      <el-table-column label="预约码头ID" align="center" prop="dockId" />
-      <el-table-column label="预约码头名称" align="center" prop="dockName" />
-      <el-table-column label="预约码头编码" align="center" prop="dockCode" />
-      <el-table-column label="码头预约开始" align="center" prop="dockStart" width="180">
+      <el-table-column label="码头名称" align="center" prop="dockName" />
+      <el-table-column label="叉车每托货卸货时长(分钟)" align="center" prop="unloadingDuration" />
+      <el-table-column label="叉车每托货装货时长(分钟)" align="center" prop="loadingDuration" />
+      <el-table-column label="码头工作时间" align="center" prop="workDays">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.dockStart, '{y}-{m}-{d}') }}</span>
+          <span>{{ formatWorkDays(scope.row.workDays) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="码头预约结束" align="center" prop="dockEnd" width="180">
+      <el-table-column label="有效状态" align="center" prop="status">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.dockEnd, '{y}-{m}-{d}') }}</span>
+          <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'">
+            {{ scope.row.status === 1 ? '启用' : '停用' }}
+          </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="装卸点ID" align="center" prop="loadingPointId" />
-      <el-table-column label="装卸点编号" align="center" prop="loadingPointCode" />
-      <el-table-column label="装卸点名称" align="center" prop="loadingPointName" />
-      <el-table-column label="叉车司机ID(主要)" align="center" prop="forkliftDriverId" />
-      <el-table-column label="叉车司机姓名" align="center" prop="forkliftDriverName" />
-      <el-table-column label="叉车编号" align="center" prop="forkliftNo" />
-      <el-table-column label="叉车其他人员" align="center" prop="forkliftExtra" />
-      <el-table-column label="装卸托数" align="center" prop="loadingQty" />
-      <el-table-column label="装卸开始时间" align="center" prop="loadingStart" width="180">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.loadingStart, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="装卸完成时间" align="center" prop="loadingFinish" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.loadingFinish, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="装卸点释放时间" align="center" prop="pointReleaseTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.pointReleaseTime, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="到达码头时间(撞栏)" align="center" prop="arriveTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.arriveTime, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="驶离码头时间" align="center" prop="leaveTime" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.leaveTime, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="作业状态" align="center" prop="workStatus" />
-      <el-table-column label="所属公司ID" align="center" prop="factoryId" />
-      <el-table-column label="所属公司名称" align="center" prop="factoryName" />
-      <el-table-column label="部门id" align="center" prop="deptId" />
-      <el-table-column label="删除状态" align="center" prop="deleted" />
-      <el-table-column label="创建时间" align="center" prop="createDate" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createDate, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="修改时间" align="center" prop="updateDate" width="180">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.updateDate, '{y}-{m}-{d}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="时间明细ID" align="center" prop="planTimeDetailId" />
-      <el-table-column label="排队序号" align="center" prop="queueNumber" />
-      <el-table-column label="预计等待时间" align="center" prop="expectWaitTime" />
-      <el-table-column label="排队状态" align="center" prop="queueStatus" />
-      <el-table-column label="是否作业完成插队" align="center" prop="isWorkedJump" />
-      <el-table-column label="码头顺序" align="center" prop="dockSort" />
-      <el-table-column label="停车位ID" align="center" prop="parkingId" />
-      <el-table-column label="车型" align="center" prop="carModel" />
-      <el-table-column label="停车位编码" align="center" prop="parkingCode" />
-      <el-table-column label="装卸任务编码" align="center" prop="loadingTaskCode" />
-      <el-table-column label="装卸类型" align="center" prop="loadingType" />
-      <el-table-column label="厂区ID" align="center" prop="factoryAreaId" />
-      <el-table-column label="厂区名称" align="center" prop="factoryAreaName" />
-      <el-table-column label="厂区部门ID" align="center" prop="areaDeptId" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleDetail(scope.row)"
+            v-hasPermi="['system:dock:query']"
+          >详情</el-button>
           <el-button
             size="mini"
             type="text"
@@ -456,7 +110,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -465,172 +119,117 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改预约任务-码头明细对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="主表id" prop="taskId">
-          <el-input v-model="form.taskId" placeholder="请输入主表id" />
+    <!-- 添加或修改码头对话框 -->
+    <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="180px" :disabled="isDetail">
+        <el-form-item label="码头名称" prop="dockName">
+          <el-input v-model="form.dockName" placeholder="请输入码头名称" />
         </el-form-item>
-        <el-form-item label="行号" prop="lineNo">
-          <el-input v-model="form.lineNo" placeholder="请输入行号" />
+        <el-form-item label="叉车每托货卸货时长(分钟)" prop="unloadingDuration">
+          <el-input-number v-model="form.unloadingDuration" :min="0" :precision="1" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="预约码头ID" prop="dockId">
-          <el-input v-model="form.dockId" placeholder="请输入预约码头ID" />
+        <el-form-item label="叉车每托货装货时长(分钟)" prop="loadingDuration">
+          <el-input-number v-model="form.loadingDuration" :min="0" :precision="1" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="预约码头名称" prop="dockName">
-          <el-input v-model="form.dockName" placeholder="请输入预约码头名称" />
+        <el-form-item label="码头工作时间设置" prop="workDays">
+          <el-select v-model="form.workDaysList" multiple placeholder="请选择工作日">
+            <el-option label="周一" value="1" />
+            <el-option label="周二" value="2" />
+            <el-option label="周三" value="3" />
+            <el-option label="周四" value="4" />
+            <el-option label="周五" value="5" />
+            <el-option label="周六" value="6" />
+            <el-option label="周日" value="7" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="预约码头编码" prop="dockCode">
-          <el-input v-model="form.dockCode" placeholder="请输入预约码头编码" />
-        </el-form-item>
-        <el-form-item label="码头预约开始" prop="dockStart">
-          <el-date-picker clearable
-            v-model="form.dockStart"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择码头预约开始">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="码头预约结束" prop="dockEnd">
-          <el-date-picker clearable
-            v-model="form.dockEnd"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择码头预约结束">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="装卸点ID" prop="loadingPointId">
-          <el-input v-model="form.loadingPointId" placeholder="请输入装卸点ID" />
-        </el-form-item>
-        <el-form-item label="装卸点编号" prop="loadingPointCode">
-          <el-input v-model="form.loadingPointCode" placeholder="请输入装卸点编号" />
-        </el-form-item>
-        <el-form-item label="装卸点名称" prop="loadingPointName">
-          <el-input v-model="form.loadingPointName" placeholder="请输入装卸点名称" />
-        </el-form-item>
-        <el-form-item label="叉车司机ID(主要)" prop="forkliftDriverId">
-          <el-input v-model="form.forkliftDriverId" placeholder="请输入叉车司机ID(主要)" />
-        </el-form-item>
-        <el-form-item label="叉车司机姓名" prop="forkliftDriverName">
-          <el-input v-model="form.forkliftDriverName" placeholder="请输入叉车司机姓名" />
-        </el-form-item>
-        <el-form-item label="叉车编号" prop="forkliftNo">
-          <el-input v-model="form.forkliftNo" placeholder="请输入叉车编号" />
-        </el-form-item>
-        <el-form-item label="叉车其他人员" prop="forkliftExtra">
-          <el-input v-model="form.forkliftExtra" placeholder="请输入叉车其他人员" />
-        </el-form-item>
-        <el-form-item label="装卸托数" prop="loadingQty">
-          <el-input v-model="form.loadingQty" placeholder="请输入装卸托数" />
-        </el-form-item>
-        <el-form-item label="装卸开始时间" prop="loadingStart">
-          <el-date-picker clearable
-            v-model="form.loadingStart"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择装卸开始时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="装卸完成时间" prop="loadingFinish">
-          <el-date-picker clearable
-            v-model="form.loadingFinish"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择装卸完成时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="装卸点释放时间" prop="pointReleaseTime">
-          <el-date-picker clearable
-            v-model="form.pointReleaseTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择装卸点释放时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="到达码头时间(撞栏)" prop="arriveTime">
-          <el-date-picker clearable
-            v-model="form.arriveTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择到达码头时间(撞栏)">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="驶离码头时间" prop="leaveTime">
-          <el-date-picker clearable
-            v-model="form.leaveTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择驶离码头时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="所属公司ID" prop="factoryId">
-          <el-input v-model="form.factoryId" placeholder="请输入所属公司ID" />
-        </el-form-item>
-        <el-form-item label="所属公司名称" prop="factoryName">
-          <el-input v-model="form.factoryName" placeholder="请输入所属公司名称" />
-        </el-form-item>
-        <el-form-item label="部门id" prop="deptId">
-          <el-input v-model="form.deptId" placeholder="请输入部门id" />
-        </el-form-item>
-        <el-form-item label="删除状态" prop="deleted">
-          <el-input v-model="form.deleted" placeholder="请输入删除状态" />
-        </el-form-item>
-        <el-form-item label="创建时间" prop="createDate">
-          <el-date-picker clearable
-            v-model="form.createDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择创建时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="修改时间" prop="updateDate">
-          <el-date-picker clearable
-            v-model="form.updateDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择修改时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="时间明细ID" prop="planTimeDetailId">
-          <el-input v-model="form.planTimeDetailId" placeholder="请输入时间明细ID" />
-        </el-form-item>
-        <el-form-item label="排队序号" prop="queueNumber">
-          <el-input v-model="form.queueNumber" placeholder="请输入排队序号" />
-        </el-form-item>
-        <el-form-item label="预计等待时间" prop="expectWaitTime">
-          <el-input v-model="form.expectWaitTime" placeholder="请输入预计等待时间" />
-        </el-form-item>
-        <el-form-item label="是否作业完成插队" prop="isWorkedJump">
-          <el-input v-model="form.isWorkedJump" placeholder="请输入是否作业完成插队" />
-        </el-form-item>
-        <el-form-item label="码头顺序" prop="dockSort">
-          <el-input v-model="form.dockSort" placeholder="请输入码头顺序" />
-        </el-form-item>
-        <el-form-item label="停车位ID" prop="parkingId">
-          <el-input v-model="form.parkingId" placeholder="请输入停车位ID" />
-        </el-form-item>
-        <el-form-item label="车型" prop="carModel">
-          <el-input v-model="form.carModel" placeholder="请输入车型" />
-        </el-form-item>
-        <el-form-item label="停车位编码" prop="parkingCode">
-          <el-input v-model="form.parkingCode" placeholder="请输入停车位编码" />
-        </el-form-item>
-        <el-form-item label="装卸任务编码" prop="loadingTaskCode">
-          <el-input v-model="form.loadingTaskCode" placeholder="请输入装卸任务编码" />
-        </el-form-item>
-        <el-form-item label="厂区ID" prop="factoryAreaId">
-          <el-input v-model="form.factoryAreaId" placeholder="请输入厂区ID" />
-        </el-form-item>
-        <el-form-item label="厂区名称" prop="factoryAreaName">
-          <el-input v-model="form.factoryAreaName" placeholder="请输入厂区名称" />
-        </el-form-item>
-        <el-form-item label="厂区部门ID" prop="areaDeptId">
-          <el-input v-model="form.areaDeptId" placeholder="请输入厂区部门ID" />
+        <el-form-item label="有效状态" prop="status">
+          <el-select v-model="form.status" placeholder="请选择">
+            <el-option label="启用" :value="1" />
+            <el-option label="停用" :value="0" />
+          </el-select>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+
+      <!-- 装卸点明细 -->
+      <div style="margin: 10px 20px;">
+        <el-divider content-position="left">装卸点明细</el-divider>
+        <el-button
+          v-if="!isDetail"
+          type="primary"
+          size="mini"
+          icon="el-icon-plus"
+          @click="addLoadingPoint"
+          style="margin-bottom: 10px;"
+        >新增装卸点</el-button>
+        <el-table :data="form.loadingPointList" border size="small">
+          <el-table-column label="编码" align="center" prop="loadingPointCode">
+            <template slot-scope="scope">
+              <el-input v-if="!isDetail" v-model="scope.row.loadingPointCode" size="small" placeholder="请输入编码" />
+              <span v-else>{{ scope.row.loadingPointCode }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="有效状态" align="center" prop="status" width="150">
+            <template slot-scope="scope">
+              <el-select v-if="!isDetail" v-model="scope.row.status" size="small" placeholder="请选择">
+                <el-option label="启用" :value="1" />
+                <el-option label="停用" :value="0" />
+              </el-select>
+              <el-tag v-else :type="scope.row.status === 1 ? 'success' : 'danger'">
+                {{ scope.row.status === 1 ? '启用' : '停用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column v-if="!isDetail" label="操作" align="center" width="80">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" icon="el-icon-delete" @click="removeLoadingPoint(scope.$index)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <!-- 停车位明细 -->
+      <div style="margin: 10px 20px;">
+        <el-divider content-position="left">停车位明细</el-divider>
+        <el-button
+          v-if="!isDetail"
+          type="primary"
+          size="mini"
+          icon="el-icon-plus"
+          @click="addParkingSpace"
+          style="margin-bottom: 10px;"
+        >新增停车位</el-button>
+        <el-table :data="form.parkingSpaceList" border size="small">
+          <el-table-column label="编码" align="center" prop="parkingSpaceCode">
+            <template slot-scope="scope">
+              <el-input v-if="!isDetail" v-model="scope.row.parkingSpaceCode" size="small" placeholder="请输入编码" />
+              <span v-else>{{ scope.row.parkingSpaceCode }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="有效状态" align="center" prop="status" width="150">
+            <template slot-scope="scope">
+              <el-select v-if="!isDetail" v-model="scope.row.status" size="small" placeholder="请选择">
+                <el-option label="启用" :value="1" />
+                <el-option label="停用" :value="0" />
+              </el-select>
+              <el-tag v-else :type="scope.row.status === 1 ? 'success' : 'danger'">
+                {{ scope.row.status === 1 ? '启用' : '停用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column v-if="!isDetail" label="操作" align="center" width="80">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" icon="el-icon-delete" @click="removeParkingSpace(scope.$index)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <div slot="footer" class="dialog-footer" v-if="!isDetail">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
+      </div>
+      <div slot="footer" class="dialog-footer" v-else>
+        <el-button @click="cancel">关 闭</el-button>
       </div>
     </el-dialog>
   </div>
@@ -643,82 +242,35 @@ export default {
   name: "Dock",
   data() {
     return {
-      // 遮罩层
       loading: true,
-      // 选中数组
       ids: [],
-      // 非单个禁用
       single: true,
-      // 非多个禁用
       multiple: true,
-      // 显示搜索条件
       showSearch: true,
-      // 总条数
       total: 0,
-      // 预约任务-码头明细表格数据
       dockList: [],
-      // 弹出层标题
       title: "",
-      // 是否显示弹出层
       open: false,
-      // 查询参数
+      isDetail: false,
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        taskId: null,
-        lineNo: null,
-        dockId: null,
         dockName: null,
-        dockCode: null,
-        dockStart: null,
-        dockEnd: null,
-        loadingPointId: null,
-        loadingPointCode: null,
-        loadingPointName: null,
-        forkliftDriverId: null,
-        forkliftDriverName: null,
-        forkliftNo: null,
-        forkliftExtra: null,
-        loadingQty: null,
-        loadingStart: null,
-        loadingFinish: null,
-        pointReleaseTime: null,
-        arriveTime: null,
-        leaveTime: null,
-        workStatus: null,
-        factoryId: null,
-        factoryName: null,
-        deptId: null,
-        deleted: null,
-        createDate: null,
-        updateDate: null,
-        planTimeDetailId: null,
-        queueNumber: null,
-        expectWaitTime: null,
-        queueStatus: null,
-        isWorkedJump: null,
-        dockSort: null,
-        parkingId: null,
-        carModel: null,
-        parkingCode: null,
-        loadingTaskCode: null,
-        loadingType: null,
-        factoryAreaId: null,
-        factoryAreaName: null,
-        areaDeptId: null
+        status: null
       },
-      // 表单参数
       form: {},
-      // 表单校验
       rules: {
-      }
+        dockName: [
+          { required: true, message: "码头名称不能为空", trigger: "blur" }
+        ]
+      },
+      workDaysMap: { '1': '周一', '2': '周二', '3': '周三', '4': '周四', '5': '周五', '6': '周六', '7': '周日' }
     };
   },
   created() {
     this.getList();
   },
   methods: {
-    /** 查询预约任务-码头明细列表 */
     getList() {
       this.loading = true;
       listDock(this.queryParams).then(response => {
@@ -727,97 +279,96 @@ export default {
         this.loading = false;
       });
     },
-    // 取消按钮
+    formatWorkDays(workDays) {
+      if (!workDays) return '';
+      return workDays.split(',').map(d => this.workDaysMap[d] || d).join('、');
+    },
     cancel() {
       this.open = false;
       this.reset();
     },
-    // 表单重置
     reset() {
       this.form = {
         id: null,
-        taskId: null,
-        lineNo: null,
-        dockId: null,
         dockName: null,
-        dockCode: null,
-        dockStart: null,
-        dockEnd: null,
-        loadingPointId: null,
-        loadingPointCode: null,
-        loadingPointName: null,
-        forkliftDriverId: null,
-        forkliftDriverName: null,
-        forkliftNo: null,
-        forkliftExtra: null,
-        loadingQty: null,
-        loadingStart: null,
-        loadingFinish: null,
-        pointReleaseTime: null,
-        arriveTime: null,
-        leaveTime: null,
-        workStatus: "0",
-        factoryId: null,
-        factoryName: null,
-        deptId: null,
-        deleted: null,
-        createBy: null,
-        createDate: null,
-        updateBy: null,
-        updateDate: null,
-        planTimeDetailId: null,
-        queueNumber: null,
-        expectWaitTime: null,
-        queueStatus: "0",
-        isWorkedJump: null,
-        dockSort: null,
-        parkingId: null,
-        carModel: null,
-        parkingCode: null,
-        loadingTaskCode: null,
-        loadingType: null,
-        factoryAreaId: null,
-        factoryAreaName: null,
-        areaDeptId: null
+        unloadingDuration: null,
+        loadingDuration: null,
+        workDays: null,
+        workDaysList: [],
+        status: 1,
+        loadingPointList: [],
+        parkingSpaceList: []
       };
+      this.isDetail = false;
       this.resetForm("form");
     },
-    /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
-      this.multiple = !selection.length
+      this.ids = selection.map(item => item.id);
+      this.single = selection.length !== 1;
+      this.multiple = !selection.length;
     },
-    /** 新增按钮操作 */
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加预约任务-码头明细";
+      this.title = "新增码头";
     },
-    /** 修改按钮操作 */
-    handleUpdate(row) {
+    handleDetail(row) {
       this.reset();
-      const id = row.id || this.ids
-      getDock(id).then(response => {
+      getDock(row.id).then(response => {
         this.form = response.data;
+        this.form.workDaysList = this.form.workDays ? this.form.workDays.split(',') : [];
+        if (!this.form.loadingPointList) this.form.loadingPointList = [];
+        if (!this.form.parkingSpaceList) this.form.parkingSpaceList = [];
+        this.isDetail = true;
         this.open = true;
-        this.title = "修改预约任务-码头明细";
+        this.title = "码头详情";
       });
     },
-    /** 提交按钮 */
+    handleUpdate(row) {
+      this.reset();
+      const id = row.id || this.ids[0];
+      getDock(id).then(response => {
+        this.form = response.data;
+        this.form.workDaysList = this.form.workDays ? this.form.workDays.split(',') : [];
+        if (!this.form.loadingPointList) this.form.loadingPointList = [];
+        if (!this.form.parkingSpaceList) this.form.parkingSpaceList = [];
+        this.open = true;
+        this.title = "修改码头";
+      });
+    },
+    addLoadingPoint() {
+      this.form.loadingPointList.push({
+        loadingPointCode: '',
+        status: 1,
+        isOccupy: '0'
+      });
+    },
+    removeLoadingPoint(index) {
+      this.form.loadingPointList.splice(index, 1);
+    },
+    addParkingSpace() {
+      this.form.parkingSpaceList.push({
+        parkingSpaceCode: '',
+        status: 1,
+        isOccupy: '0'
+      });
+    },
+    removeParkingSpace(index) {
+      this.form.parkingSpaceList.splice(index, 1);
+    },
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          // 将workDaysList转为逗号分隔字符串
+          this.form.workDays = this.form.workDaysList ? this.form.workDaysList.join(',') : '';
           if (this.form.id != null) {
             updateDock(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
@@ -834,17 +385,15 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除预约任务-码头明细编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除所选码头数据？').then(function() {
         return delDock(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
-    /** 导出按钮操作 */
     handleExport() {
       this.download('system/dock/export', {
         ...this.queryParams

@@ -58,4 +58,12 @@ public interface FDockLoadingPointMapper
      * @return 结果
      */
     public int deleteFDockLoadingPointByIds(Long[] ids);
+
+    /**
+     * 根据码头ID删除装卸点明细
+     *
+     * @param dockId 码头ID
+     * @return 结果
+     */
+    public int deleteFDockLoadingPointByDockId(Long dockId);
 }

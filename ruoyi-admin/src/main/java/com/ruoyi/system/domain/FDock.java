@@ -2,6 +2,7 @@ package com.ruoyi.system.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -110,6 +111,10 @@ public class FDock extends BaseEntity
     /** 是否需要叉车工作 1需要 0不需要 */
     @Excel(name = "是否需要叉车工作 1需要 0不需要")
     private Integer forkliftWork;
+
+    private List<FDockLoadingPoint> loadingPointList;
+
+    private List<FDockParkingSpace> parkingSpaceList;
 
     public void setId(Long id) 
     {
@@ -314,9 +319,29 @@ public class FDock extends BaseEntity
         this.forkliftWork = forkliftWork;
     }
 
-    public Integer getForkliftWork() 
+    public Integer getForkliftWork()
     {
         return forkliftWork;
+    }
+
+    public void setLoadingPointList(List<FDockLoadingPoint> loadingPointList)
+    {
+        this.loadingPointList = loadingPointList;
+    }
+
+    public List<FDockLoadingPoint> getLoadingPointList()
+    {
+        return loadingPointList;
+    }
+
+    public void setParkingSpaceList(List<FDockParkingSpace> parkingSpaceList)
+    {
+        this.parkingSpaceList = parkingSpaceList;
+    }
+
+    public List<FDockParkingSpace> getParkingSpaceList()
+    {
+        return parkingSpaceList;
     }
 
     @Override

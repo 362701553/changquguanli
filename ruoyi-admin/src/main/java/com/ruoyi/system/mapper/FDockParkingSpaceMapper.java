@@ -58,4 +58,12 @@ public interface FDockParkingSpaceMapper
      * @return 结果
      */
     public int deleteFDockParkingSpaceByIds(Long[] ids);
+
+    /**
+     * 根据码头ID删除停车位明细
+     *
+     * @param dockId 码头ID
+     * @return 结果
+     */
+    public int deleteFDockParkingSpaceByDockId(Long dockId);
 }
