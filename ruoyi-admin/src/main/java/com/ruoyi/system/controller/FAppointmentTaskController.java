@@ -123,4 +123,26 @@ public class FAppointmentTaskController extends BaseController
     {
         return fAppointmentTaskService.checkin(id);
     }
+
+    /**
+     * 开始作业
+     */
+    @PreAuthorize("@ss.hasPermi('system:task:edit')")
+    @Log(title = "开始作业", businessType = BusinessType.UPDATE)
+    @PostMapping("/startWork/{dockTaskId}")
+    public AjaxResult startWork(@PathVariable("dockTaskId") Long dockTaskId)
+    {
+        return fAppointmentTaskService.startWork(dockTaskId);
+    }
+
+    /**
+     * 点位释放
+     */
+    @PreAuthorize("@ss.hasPermi('system:task:edit')")
+    @Log(title = "点位释放", businessType = BusinessType.UPDATE)
+    @PostMapping("/releasePoint/{dockTaskId}")
+    public AjaxResult releasePoint(@PathVariable("dockTaskId") Long dockTaskId)
+    {
+        return fAppointmentTaskService.releasePoint(dockTaskId);
+    }
 }

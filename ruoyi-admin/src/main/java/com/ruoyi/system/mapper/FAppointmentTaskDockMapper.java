@@ -74,4 +74,36 @@ public interface FAppointmentTaskDockMapper
      * @return 最大排队序号
      */
     public Long selectMaxQueueNumberByDockId(Long dockId);
+
+    /**
+     * 查询指定码头下排队状态为"停车位排队"且排队序号最小的任务
+     *
+     * @param dockId 码头ID
+     * @return 下一个排队的码头任务
+     */
+    public FAppointmentTaskDock selectNextQueuedDockTask(Long dockId);
+
+    /**
+     * 查询指定码头下排队状态为"厂外排队"且排队序号最小的任务
+     *
+     * @param dockId 码头ID
+     * @return 下一个厂外排队的码头任务
+     */
+    public FAppointmentTaskDock selectNextOutsideQueuedDockTask(Long dockId);
+
+    /**
+     * 查询指定码头下所有停车位排队的任务，按排队序号升序
+     *
+     * @param dockId 码头ID
+     * @return 停车位排队任务列表
+     */
+    public List<FAppointmentTaskDock> selectParkingQueuedList(Long dockId);
+
+    /**
+     * 查询指定码头下所有厂外排队的任务，按排队序号升序
+     *
+     * @param dockId 码头ID
+     * @return 厂外排队任务列表
+     */
+    public List<FAppointmentTaskDock> selectOutsideQueuedList(Long dockId);
 }

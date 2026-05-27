@@ -75,4 +75,20 @@ public interface IFAppointmentTaskService
      * @return 结果
      */
     public AjaxResult checkin(Long taskId);
+
+    /**
+     * 开始作业
+     *
+     * @param dockTaskId 码头任务ID
+     * @return 结果
+     */
+    public AjaxResult startWork(Long dockTaskId);
+
+    /**
+     * 点位释放
+     *
+     * @param dockTaskId 码头任务ID
+     * @return 结果
+     */
+    public AjaxResult releasePoint(Long dockTaskId);
 }

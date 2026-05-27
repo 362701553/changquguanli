@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -253,5 +254,326 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
         fAppointmentTaskMapper.updateFAppointmentTask(task);
 
         return AjaxResult.success("签到成功");
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult startWork(Long dockTaskId)
+    {
+        FAppointmentTaskDock dockTask = fAppointmentTaskDockMapper.selectFAppointmentTaskDockById(dockTaskId);
+        if (dockTask == null)
+        {
+            return AjaxResult.error("码头任务不存在");
+        }
+        if (!"0".equals(dockTask.getWorkStatus()))
+        {
+            return AjaxResult.error("只有待作业状态才能开始作业");
+        }
+        if (dockTask.getLoadingPointId() == null)
+        {
+            return AjaxResult.error("该任务尚未分配装卸点，无法开始作业");
+        }
+
+        dockTask.setWorkStatus("1");
+        dockTask.setLoadingStart(new Date());
+        fAppointmentTaskDockMapper.updateFAppointmentTaskDock(dockTask);
+
+        FAppointmentTask task = fAppointmentTaskMapper.selectFAppointmentTaskById(dockTask.getTaskId());
+        task.setTaskStatus("2");
+        fAppointmentTaskMapper.updateFAppointmentTask(task);
+
+        return AjaxResult.success("开始作业成功");
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult releasePoint(Long dockTaskId)
+    {
+        FAppointmentTaskDock currentDockTask = fAppointmentTaskDockMapper.selectFAppointmentTaskDockById(dockTaskId);
+        if (currentDockTask == null)
+        {
+            return AjaxResult.error("码头任务不存在");
+        }
+        if (!"1".equals(currentDockTask.getWorkStatus()))
+        {
+            return AjaxResult.error("只有作业中状态才能释放点位");
+        }
+
+        Long releasedDockId = currentDockTask.getDockId();
+
+        // 释放装卸点
+        if (currentDockTask.getLoadingPointId() != null)
+        {
+            FDockLoadingPoint point = fDockLoadingPointService.selectFDockLoadingPointById(currentDockTask.getLoadingPointId());
+            if (point != null)
+            {
+                point.setIsOccupy("0");
+                fDockLoadingPointService.updateFDockLoadingPoint(point);
+            }
+        }
+
+        // 当前码头任务标记完成
+        currentDockTask.setWorkStatus("2");
+        currentDockTask.setPointReleaseTime(new Date());
+        currentDockTask.setLoadingFinish(new Date());
+        currentDockTask.setQueueStatus("已完成");
+        fAppointmentTaskDockMapper.updateFAppointmentTaskDock(currentDockTask);
+
+        // 查询主任务是否有后续未处理码头
+        Long taskId = currentDockTask.getTaskId();
+        FAppointmentTaskDock queryDock = new FAppointmentTaskDock();
+        queryDock.setTaskId(taskId);
+        List<FAppointmentTaskDock> allDocks = fAppointmentTaskDockMapper.selectFAppointmentTaskDockList(queryDock);
+        List<FAppointmentTaskDock> unprocessed = allDocks.stream()
+                .sorted((a, b) -> {
+                    Long sortA = a.getDockSort() != null ? a.getDockSort() : 0L;
+                    Long sortB = b.getDockSort() != null ? b.getDockSort() : 0L;
+                    return sortA.compareTo(sortB);
+                })
+                .filter(d -> d.getLoadingTaskCode() == null || d.getLoadingTaskCode().isEmpty())
+                .collect(Collectors.toList());
+
+        FAppointmentTask task = fAppointmentTaskMapper.selectFAppointmentTaskById(taskId);
+
+        if (!unprocessed.isEmpty())
+        {
+            processNextDockWithPriority(unprocessed.get(0), task);
+        }
+        else
+        {
+            task.setTaskStatus("5");
+            fAppointmentTaskMapper.updateFAppointmentTask(task);
+        }
+
+        // 全量重排：将当前码头所有空闲装卸点和停车位重新分配给排队车辆
+        rebalanceDockQueue(releasedDockId);
+
+        return AjaxResult.success("点位释放成功");
+    }
+
+    private void processNextDockWithPriority(FAppointmentTaskDock nextDock, FAppointmentTask task)
+    {
+        Long dockId = nextDock.getDockId();
+
+        // 生成装卸任务编码
+        String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        String ltPrefix = "LT" + today;
+        String maxCode = fAppointmentTaskDockMapper.selectMaxLoadingTaskCodeByDate(ltPrefix);
+        int seq = 1;
+        if (maxCode != null && maxCode.length() > ltPrefix.length())
+        {
+            seq = Integer.parseInt(maxCode.substring(ltPrefix.length())) + 1;
+        }
+        String loadingTaskCode = ltPrefix + String.format("%04d", seq);
+        nextDock.setLoadingTaskCode(loadingTaskCode);
+        nextDock.setWorkStatus("0");
+
+        // 优先分配装卸点
+        FDockLoadingPoint queryPoint = new FDockLoadingPoint();
+        queryPoint.setDockId(dockId);
+        queryPoint.setStatus(1);
+        queryPoint.setIsOccupy("0");
+        queryPoint.setDeleted(0);
+        List<FDockLoadingPoint> freePoints = fDockLoadingPointService.selectFDockLoadingPointList(queryPoint);
+
+        if (freePoints != null && !freePoints.isEmpty())
+        {
+            FDockLoadingPoint point = freePoints.get(0);
+            point.setIsOccupy("1");
+            fDockLoadingPointService.updateFDockLoadingPoint(point);
+
+            nextDock.setLoadingPointId(point.getId());
+            nextDock.setLoadingPointCode(point.getLoadingPointCode());
+            nextDock.setLoadingPointName(point.getLoadingPointName());
+            nextDock.setQueueStatus("装卸点排队");
+            nextDock.setIsWorkedJump("1");
+        }
+        else
+        {
+            // 无空闲装卸点，插队排在第一位
+            nextDock.setQueueStatus("停车位排队");
+            nextDock.setQueueNumber(0L);
+            nextDock.setIsWorkedJump("1");
+
+            // 尝试分配停车位
+            FDockParkingSpace querySpace = new FDockParkingSpace();
+            querySpace.setDockId(dockId);
+            querySpace.setStatus(1);
+            querySpace.setIsOccupy("0");
+            querySpace.setDeleted(0);
+            List<FDockParkingSpace> freeSpaces = fDockParkingSpaceService.selectFDockParkingSpaceList(querySpace);
+            if (freeSpaces != null && !freeSpaces.isEmpty())
+            {
+                FDockParkingSpace space = freeSpaces.get(0);
+                space.setIsOccupy("1");
+                fDockParkingSpaceService.updateFDockParkingSpace(space);
+                nextDock.setParkingId(space.getId());
+                nextDock.setParkingCode(space.getParkingSpaceCode());
+            }
+        }
+
+        // 更新主任务当前码头
+        FDock dock = fDockService.selectFDockById(dockId);
+        task.setCurrentDockId(dockId);
+        if (dock != null)
+        {
+            task.setCurrentDockName(dock.getDockName());
+        }
+        fAppointmentTaskMapper.updateFAppointmentTask(task);
+
+        fAppointmentTaskDockMapper.updateFAppointmentTaskDock(nextDock);
+    }
+
+    /**
+     * 全量重排：释放后将当前码头所有空闲装卸点和停车位重新分配给排队车辆
+     * 优先级：停车位排队 > 厂外排队（按queue_number升序）
+     * 逻辑：
+     *   1. 查询所有空闲装卸点，按优先级分配给排队车辆
+     *   2. 被提升到装卸点的车辆释放停车位，跟踪释放的停车位
+     *   3. 将所有空闲停车位（含刚释放的）分配给厂外排队的车辆
+     */
+    private void rebalanceDockQueue(Long dockId)
+    {
+        // 获取所有停车位排队的车辆（按queue_number升序）
+        List<FAppointmentTaskDock> parkingQueued = fAppointmentTaskDockMapper.selectParkingQueuedList(dockId);
+        // 获取所有厂外排队的车辆（按queue_number升序）
+        List<FAppointmentTaskDock> outsideQueued = fAppointmentTaskDockMapper.selectOutsideQueuedList(dockId);
+
+        if (parkingQueued.isEmpty() && outsideQueued.isEmpty())
+        {
+            return;
+        }
+
+        // === 第一步：将所有空闲装卸点分配给排队车辆 ===
+        FDockLoadingPoint queryPoint = new FDockLoadingPoint();
+        queryPoint.setDockId(dockId);
+        queryPoint.setStatus(1);
+        queryPoint.setIsOccupy("0");
+        queryPoint.setDeleted(0);
+        List<FDockLoadingPoint> freePoints = fDockLoadingPointService.selectFDockLoadingPointList(queryPoint);
+
+        // 跟踪被释放的停车位（停车位排队车辆提升到装卸点后释放的）
+        List<FDockParkingSpace> freedParkingSpaces = new ArrayList<>();
+        // 跟踪已被分配到装卸点的厂外排队车辆索引
+        int outsidePromotedCount = 0;
+
+        if (freePoints != null && !freePoints.isEmpty())
+        {
+            int pointIndex = 0;
+
+            // 先分配停车位排队的车辆到装卸点
+            for (int i = 0; i < parkingQueued.size() && pointIndex < freePoints.size(); i++)
+            {
+                FAppointmentTaskDock queued = parkingQueued.get(i);
+                FDockLoadingPoint point = freePoints.get(pointIndex++);
+
+                point.setIsOccupy("1");
+                fDockLoadingPointService.updateFDockLoadingPoint(point);
+
+                queued.setLoadingPointId(point.getId());
+                queued.setLoadingPointCode(point.getLoadingPointCode());
+                queued.setLoadingPointName(point.getLoadingPointName());
+                queued.setQueueStatus("装卸点排队");
+                queued.setQueueNumber(0L);
+
+                // 释放其停车位，加入释放列表
+                if (queued.getParkingId() != null)
+                {
+                    FDockParkingSpace space = fDockParkingSpaceService.selectFDockParkingSpaceById(queued.getParkingId());
+                    if (space != null)
+                    {
+                        space.setIsOccupy("0");
+                        fDockParkingSpaceService.updateFDockParkingSpace(space);
+                        freedParkingSpaces.add(space);
+                    }
+                }
+
+                fAppointmentTaskDockMapper.updateFAppointmentTaskDock(queued);
+            }
+
+            // 如果还有空闲装卸点，分配给厂外排队的车辆
+            for (int i = 0; i < outsideQueued.size() && pointIndex < freePoints.size(); i++)
+            {
+                FAppointmentTaskDock queued = outsideQueued.get(i);
+                FDockLoadingPoint point = freePoints.get(pointIndex++);
+
+                point.setIsOccupy("1");
+                fDockLoadingPointService.updateFDockLoadingPoint(point);
+
+                queued.setLoadingPointId(point.getId());
+                queued.setLoadingPointCode(point.getLoadingPointCode());
+                queued.setLoadingPointName(point.getLoadingPointName());
+                queued.setQueueStatus("装卸点排队");
+                queued.setQueueNumber(0L);
+
+                fAppointmentTaskDockMapper.updateFAppointmentTaskDock(queued);
+                outsidePromotedCount++;
+
+                // 厂外排队的车辆进入装卸点，主任务从"待入厂"变为"待作业"
+                FAppointmentTask outsideTask = fAppointmentTaskMapper.selectFAppointmentTaskById(queued.getTaskId());
+                if (outsideTask != null && "4".equals(outsideTask.getTaskStatus()))
+                {
+                    outsideTask.setTaskStatus("1");
+                    fAppointmentTaskMapper.updateFAppointmentTask(outsideTask);
+                }
+            }
+        }
+
+        // === 第二步：将空闲停车位分配给剩余厂外排队的车辆 ===
+        // 剩余未被分配装卸点的厂外车辆
+        List<FAppointmentTaskDock> remainingOutside = outsideQueued.subList(
+                outsidePromotedCount, outsideQueued.size());
+
+        if (remainingOutside.isEmpty())
+        {
+            return;
+        }
+
+        // 合并：查询数据库中原本空闲的停车位 + 刚被释放的停车位
+        FDockParkingSpace querySpace = new FDockParkingSpace();
+        querySpace.setDockId(dockId);
+        querySpace.setStatus(1);
+        querySpace.setIsOccupy("0");
+        querySpace.setDeleted(0);
+        List<FDockParkingSpace> dbFreeSpaces = fDockParkingSpaceService.selectFDockParkingSpaceList(querySpace);
+
+        // 合并两个来源的空闲停车位，去重
+        List<FDockParkingSpace> allFreeSpaces = new ArrayList<>();
+        if (dbFreeSpaces != null)
+        {
+            allFreeSpaces.addAll(dbFreeSpaces);
+        }
+        for (FDockParkingSpace freed : freedParkingSpaces)
+        {
+            boolean exists = allFreeSpaces.stream().anyMatch(s -> s.getId().equals(freed.getId()));
+            if (!exists)
+            {
+                allFreeSpaces.add(freed);
+            }
+        }
+
+        int spaceIndex = 0;
+        for (int i = 0; i < remainingOutside.size() && spaceIndex < allFreeSpaces.size(); i++)
+        {
+            FAppointmentTaskDock queued = remainingOutside.get(i);
+            FDockParkingSpace space = allFreeSpaces.get(spaceIndex++);
+
+            space.setIsOccupy("1");
+            fDockParkingSpaceService.updateFDockParkingSpace(space);
+
+            queued.setParkingId(space.getId());
+            queued.setParkingCode(space.getParkingSpaceCode());
+            queued.setQueueStatus("停车位排队");
+
+            fAppointmentTaskDockMapper.updateFAppointmentTaskDock(queued);
+
+            // 主任务状态从"待入厂"变为"待作业"
+            FAppointmentTask outsideTask = fAppointmentTaskMapper.selectFAppointmentTaskById(queued.getTaskId());
+            if (outsideTask != null && "4".equals(outsideTask.getTaskStatus()))
+            {
+                outsideTask.setTaskStatus("1");
+                fAppointmentTaskMapper.updateFAppointmentTask(outsideTask);
+            }
+        }
     }
 }

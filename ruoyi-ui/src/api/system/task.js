@@ -59,3 +59,19 @@ export function addTaskDock(data) {
     data: data
   })
 }
+
+// 开始作业
+export function startWork(dockTaskId) {
+  return request({
+    url: '/system/task/startWork/' + dockTaskId,
+    method: 'post'
+  })
+}
+
+// 点位释放
+export function releasePoint(dockTaskId) {
+  return request({
+    url: '/system/task/releasePoint/' + dockTaskId,
+    method: 'post'
+  })
+}

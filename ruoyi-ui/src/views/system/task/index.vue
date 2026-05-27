@@ -24,6 +24,7 @@
           <el-option label="作业中" value="2" />
           <el-option label="已完成" value="3" />
           <el-option label="待入厂" value="4" />
+          <el-option label="待签出" value="5" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -250,6 +251,24 @@
             <el-tag :type="dockStatusTagType(scope.row.workStatus)">{{ dockStatusText(scope.row.workStatus) }}</el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="操作" align="center" width="160">
+          <template slot-scope="scope">
+            <el-button
+              v-if="scope.row.workStatus === '0' && scope.row.loadingPointId"
+              size="mini"
+              type="text"
+              icon="el-icon-video-play"
+              @click="handleStartWork(scope.row)"
+            >作业</el-button>
+            <el-button
+              v-if="scope.row.workStatus === '1'"
+              size="mini"
+              type="text"
+              icon="el-icon-unlock"
+              @click="handleReleasePoint(scope.row)"
+            >点位释放</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <div slot="footer" class="dialog-footer">
         <el-button @click="viewOpen = false">关 闭</el-button>
@@ -288,7 +307,7 @@
 </template>
 
 <script>
-import { listTask, getTask, delTask, addTask, checkinTask, addTaskDock } from "@/api/system/task";
+import { listTask, getTask, delTask, addTask, checkinTask, addTaskDock, startWork, releasePoint } from "@/api/system/task";
 import { listDock } from "@/api/system/dock";
 import { listVehicle } from "@/api/system/vehicle";
 
@@ -393,11 +412,11 @@ export default {
       }
     },
     statusText(status) {
-      const map = { '0': '待签到', '1': '待作业', '2': '作业中', '3': '已完成', '4': '待入厂' };
+      const map = { '0': '待签到', '1': '待作业', '2': '作业中', '3': '已完成', '4': '待入厂', '5': '待签出' };
       return map[status] || '未知';
     },
     statusTagType(status) {
-      const map = { '0': 'info', '1': 'warning', '2': '', '3': 'success', '4': 'danger' };
+      const map = { '0': 'info', '1': 'warning', '2': '', '3': 'success', '4': 'danger', '5': 'warning' };
       return map[status] || 'info';
     },
     dockStatusText(status) {
@@ -468,6 +487,24 @@ export default {
           this.getList();
         }).catch(() => {
           this.checkinLoading = false;
+        });
+      }).catch(() => {});
+    },
+    handleStartWork(row) {
+      this.$modal.confirm('确认开始作业？').then(() => {
+        startWork(row.id).then(response => {
+          this.$modal.msgSuccess(response.msg || "操作成功");
+          this.handleView(this.viewForm);
+          this.getList();
+        });
+      }).catch(() => {});
+    },
+    handleReleasePoint(row) {
+      this.$modal.confirm('确认释放该装卸点？释放后将自动安排下一任务。').then(() => {
+        releasePoint(row.id).then(response => {
+          this.$modal.msgSuccess(response.msg || "点位释放成功");
+          this.handleView(this.viewForm);
+          this.getList();
         });
       }).catch(() => {});
     },

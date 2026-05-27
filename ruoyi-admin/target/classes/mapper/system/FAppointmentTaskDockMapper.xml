@@ -271,4 +271,38 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select max(queue_number) from f_appointment_task_dock
         where dock_id = #{dockId} and queue_number is not null
     </select>
+
+    <select id="selectNextQueuedDockTask" parameterType="Long" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        where dock_id = #{dockId}
+          and queue_status = '停车位排队'
+          and work_status = '0'
+        order by queue_number asc
+        limit 1
+    </select>
+
+    <select id="selectNextOutsideQueuedDockTask" parameterType="Long" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        where dock_id = #{dockId}
+          and queue_status = '厂外排队'
+          and work_status = '0'
+        order by queue_number asc
+        limit 1
+    </select>
+
+    <select id="selectParkingQueuedList" parameterType="Long" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        where dock_id = #{dockId}
+          and queue_status = '停车位排队'
+          and work_status = '0'
+        order by queue_number asc
+    </select>
+
+    <select id="selectOutsideQueuedList" parameterType="Long" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        where dock_id = #{dockId}
+          and queue_status = '厂外排队'
+          and work_status = '0'
+        order by queue_number asc
+    </select>
 </mapper>
