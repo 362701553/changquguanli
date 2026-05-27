@@ -256,9 +256,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteFAppointmentTaskDockByIds" parameterType="String">
-        delete from f_appointment_task_dock where id in 
+        delete from f_appointment_task_dock where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
+
+    <select id="selectMaxLoadingTaskCodeByDate" parameterType="String" resultType="String">
+        select max(loading_task_code) from f_appointment_task_dock
+        where loading_task_code like concat(#{datePrefix}, '%')
+    </select>
+
+    <select id="selectMaxQueueNumberByDockId" parameterType="Long" resultType="Long">
+        select max(queue_number) from f_appointment_task_dock
+        where dock_id = #{dockId} and queue_number is not null
+    </select>
 </mapper>

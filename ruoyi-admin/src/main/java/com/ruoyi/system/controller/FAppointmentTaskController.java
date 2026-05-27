@@ -112,4 +112,15 @@ public class FAppointmentTaskController extends BaseController
     {
         return toAjax(fAppointmentTaskService.deleteFAppointmentTaskByIds(ids));
     }
+
+    /**
+     * 签到排队
+     */
+    @PreAuthorize("@ss.hasPermi('system:task:edit')")
+    @Log(title = "预约任务签到", businessType = BusinessType.UPDATE)
+    @PostMapping("/checkin/{id}")
+    public AjaxResult checkin(@PathVariable("id") Long id)
+    {
+        return fAppointmentTaskService.checkin(id);
+    }
 }

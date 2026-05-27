@@ -20,9 +20,10 @@
       <el-form-item label="任务状态" prop="taskStatus">
         <el-select v-model="queryParams.taskStatus" placeholder="请选择状态" clearable>
           <el-option label="待签到" value="0" />
-          <el-option label="已签到" value="1" />
+          <el-option label="待作业" value="1" />
           <el-option label="作业中" value="2" />
           <el-option label="已完成" value="3" />
+          <el-option label="待入厂" value="4" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -86,6 +87,11 @@
       <el-table-column label="任务状态" align="center" prop="taskStatus" min-width="100">
         <template slot-scope="scope">
           <el-tag :type="statusTagType(scope.row.taskStatus)">{{ statusText(scope.row.taskStatus) }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="当前排队码头" align="center" prop="currentDockName" min-width="120">
+        <template slot-scope="scope">
+          <span>{{ scope.row.currentDockName || '-' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createDate" min-width="160">
@@ -188,7 +194,7 @@
     </el-dialog>
 
     <!-- 查看详情对话框 -->
-    <el-dialog title="任务详情" :visible.sync="viewOpen" width="700px" append-to-body>
+    <el-dialog title="任务详情" :visible.sync="viewOpen" width="800px" append-to-body>
       <el-descriptions :column="2" border>
         <el-descriptions-item label="任务编号">{{ viewForm.taskCode }}</el-descriptions-item>
         <el-descriptions-item label="任务状态">
@@ -202,19 +208,44 @@
             {{ parseTime(viewForm.appointmentStart, '{h}:{i}') }} - {{ parseTime(viewForm.appointmentEnd, '{h}:{i}') }}
           </span>
         </el-descriptions-item>
-        <el-descriptions-item label="创建时间" :span="2">{{ parseTime(viewForm.createDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</el-descriptions-item>
+        <el-descriptions-item label="当前排队码头">{{ viewForm.currentDockName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ parseTime(viewForm.createDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</el-descriptions-item>
       </el-descriptions>
-      <el-divider content-position="left">码头明细</el-divider>
-      <el-table :data="viewDockList" border style="width: 100%;">
+
+      <!-- 签到按钮区域 -->
+      <el-row style="margin-top: 16px; margin-bottom: 16px;" v-if="viewForm.taskStatus === '0'">
+        <el-button type="success" icon="el-icon-check" @click="handleCheckin" :loading="checkinLoading">签 到</el-button>
+      </el-row>
+
+      <el-divider content-position="left">装卸任务</el-divider>
+      <el-row style="margin-bottom: 10px;">
+        <el-button type="primary" size="small" icon="el-icon-plus" @click="handleAddLoadingTask">新增装卸任务</el-button>
+      </el-row>
+      <el-table :data="loadingTaskList" border style="width: 100%;">
         <el-table-column label="序号" type="index" width="60" align="center" />
-        <el-table-column label="码头名称" align="center" prop="dockName" />
-        <el-table-column label="码头编码" align="center" prop="dockCode" />
-        <el-table-column label="装卸任务号" align="center" prop="loadingTaskCode">
+        <el-table-column label="装卸任务编码" align="center" prop="loadingTaskCode" min-width="140" />
+        <el-table-column label="码头名称" align="center" prop="dockName" min-width="100" />
+        <el-table-column label="装卸点编码" align="center" min-width="100">
           <template slot-scope="scope">
-            <span>{{ scope.row.loadingTaskCode || '-' }}</span>
+            <span>{{ scope.row.loadingPointCode || '-' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="作业状态" align="center" prop="workStatus">
+        <el-table-column label="停车位编码" align="center" min-width="100">
+          <template slot-scope="scope">
+            <span>{{ scope.row.parkingCode || '-' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="排队序号" align="center" prop="queueNumber" width="80">
+          <template slot-scope="scope">
+            <span>{{ scope.row.queueNumber || '-' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="排队状态" align="center" prop="queueStatus" min-width="100">
+          <template slot-scope="scope">
+            <span>{{ scope.row.queueStatus || '-' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="作业状态" align="center" prop="workStatus" width="90">
           <template slot-scope="scope">
             <el-tag :type="dockStatusTagType(scope.row.workStatus)">{{ dockStatusText(scope.row.workStatus) }}</el-tag>
           </template>
@@ -224,11 +255,40 @@
         <el-button @click="viewOpen = false">关 闭</el-button>
       </div>
     </el-dialog>
+
+    <!-- 新增装卸任务对话框 -->
+    <el-dialog title="新增装卸任务" :visible.sync="loadingTaskOpen" width="500px" append-to-body>
+      <el-form ref="loadingTaskForm" :model="loadingTaskForm" :rules="loadingTaskRules" label-width="100px">
+        <el-form-item label="选择码头" prop="dockId">
+          <el-select v-model="loadingTaskForm.dockId" placeholder="请选择码头" filterable style="width: 100%;">
+            <el-option
+              v-for="dock in dockList"
+              :key="dock.id"
+              :label="dock.dockName"
+              :value="dock.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="装卸类型" prop="loadingType">
+          <el-select v-model="loadingTaskForm.loadingType" placeholder="请选择装卸类型" style="width: 100%;">
+            <el-option label="装货" value="装货" />
+            <el-option label="卸货" value="卸货" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="装卸托数" prop="loadingQty">
+          <el-input-number v-model="loadingTaskForm.loadingQty" :min="1" style="width: 100%;" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitLoadingTask">确 定</el-button>
+        <el-button @click="loadingTaskOpen = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listTask, getTask, delTask, addTask } from "@/api/system/task";
+import { listTask, getTask, delTask, addTask, checkinTask, addTaskDock } from "@/api/system/task";
 import { listDock } from "@/api/system/dock";
 import { listVehicle } from "@/api/system/vehicle";
 
@@ -250,6 +310,14 @@ export default {
       viewDockList: [],
       driverList: [],
       dockList: [],
+      checkinLoading: false,
+      loadingTaskOpen: false,
+      loadingTaskForm: {},
+      loadingTaskRules: {
+        dockId: [{ required: true, message: "请选择码头", trigger: "change" }],
+        loadingType: [{ required: true, message: "请选择装卸类型", trigger: "change" }],
+        loadingQty: [{ required: true, message: "请输入装卸托数", trigger: "blur" }]
+      },
       datePickerOptions: {
         disabledDate(time) {
           return time.getTime() < Date.now() - 86400000;
@@ -273,6 +341,9 @@ export default {
     };
   },
   computed: {
+    loadingTaskList() {
+      return this.viewDockList.filter(d => d.loadingTaskCode && d.loadingTaskCode !== '');
+    },
     computedStartTimeOptions() {
       const today = this.formatDate(new Date());
       if (this.form.appointmentDate === today) {
@@ -322,11 +393,11 @@ export default {
       }
     },
     statusText(status) {
-      const map = { '0': '待签到', '1': '已签到', '2': '作业中', '3': '已完成' };
+      const map = { '0': '待签到', '1': '待作业', '2': '作业中', '3': '已完成', '4': '待入厂' };
       return map[status] || '未知';
     },
     statusTagType(status) {
-      const map = { '0': 'info', '1': 'warning', '2': '', '3': 'success' };
+      const map = { '0': 'info', '1': 'warning', '2': '', '3': 'success', '4': 'danger' };
       return map[status] || 'info';
     },
     dockStatusText(status) {
@@ -384,6 +455,57 @@ export default {
         this.viewForm = response.data;
         this.viewDockList = response.dockList || [];
         this.viewOpen = true;
+      });
+    },
+    handleCheckin() {
+      this.$modal.confirm('确认对该任务进行签到操作？').then(() => {
+        this.checkinLoading = true;
+        checkinTask(this.viewForm.id).then(response => {
+          this.$modal.msgSuccess(response.msg || "签到成功");
+          this.checkinLoading = false;
+          // 刷新详情数据
+          this.handleView(this.viewForm);
+          this.getList();
+        }).catch(() => {
+          this.checkinLoading = false;
+        });
+      }).catch(() => {});
+    },
+    handleAddLoadingTask() {
+      this.loadingTaskForm = {
+        taskId: this.viewForm.id,
+        dockId: null,
+        loadingType: null,
+        loadingQty: 1
+      };
+      this.loadingTaskOpen = true;
+      this.$nextTick(() => {
+        if (this.$refs.loadingTaskForm) {
+          this.$refs.loadingTaskForm.clearValidate();
+        }
+      });
+    },
+    submitLoadingTask() {
+      this.$refs["loadingTaskForm"].validate(valid => {
+        if (valid) {
+          const dock = this.dockList.find(d => d.id === this.loadingTaskForm.dockId);
+          const data = {
+            taskId: this.loadingTaskForm.taskId,
+            dockId: this.loadingTaskForm.dockId,
+            dockName: dock ? dock.dockName : '',
+            dockCode: dock ? dock.dockCode : '',
+            loadingType: this.loadingTaskForm.loadingType,
+            loadingQty: this.loadingTaskForm.loadingQty,
+            workStatus: "0",
+            dockSort: this.viewDockList.length + 1
+          };
+          addTaskDock(data).then(() => {
+            this.$modal.msgSuccess("新增装卸任务成功");
+            this.loadingTaskOpen = false;
+            // 刷新详情
+            this.handleView(this.viewForm);
+          });
+        }
       });
     },
     submitForm() {

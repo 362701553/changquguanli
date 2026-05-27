@@ -42,3 +42,20 @@ export function delTask(id) {
     method: 'delete'
   })
 }
+
+// 签到排队
+export function checkinTask(id) {
+  return request({
+    url: '/system/task/checkin/' + id,
+    method: 'post'
+  })
+}
+
+// 新增装卸任务(码头明细)
+export function addTaskDock(data) {
+  return request({
+    url: '/system/TaskDock',
+    method: 'post',
+    data: data
+  })
+}

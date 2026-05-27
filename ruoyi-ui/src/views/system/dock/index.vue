@@ -179,6 +179,13 @@
               </el-tag>
             </template>
           </el-table-column>
+          <el-table-column label="占用状态" align="center" prop="isOccupy" width="120">
+            <template slot-scope="scope">
+              <el-tag :type="scope.row.isOccupy === '1' ? 'danger' : 'success'">
+                {{ scope.row.isOccupy === '1' ? '占用' : '空闲' }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column v-if="!isDetail" label="操作" align="center" width="80">
             <template slot-scope="scope">
               <el-button type="text" size="small" icon="el-icon-delete" @click="removeLoadingPoint(scope.$index)">删除</el-button>
@@ -213,6 +220,13 @@
               </el-select>
               <el-tag v-else :type="scope.row.status === 1 ? 'success' : 'danger'">
                 {{ scope.row.status === 1 ? '启用' : '停用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="占用状态" align="center" prop="isOccupy" width="120">
+            <template slot-scope="scope">
+              <el-tag :type="scope.row.isOccupy === '1' ? 'danger' : 'success'">
+                {{ scope.row.isOccupy === '1' ? '占用' : '空闲' }}
               </el-tag>
             </template>
           </el-table-column>

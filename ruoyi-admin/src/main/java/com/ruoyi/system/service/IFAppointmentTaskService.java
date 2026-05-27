@@ -2,6 +2,7 @@ package com.ruoyi.system.service;
 
 import java.util.List;
 import com.ruoyi.system.domain.FAppointmentTask;
+import com.ruoyi.common.core.domain.AjaxResult;
 
 /**
  * 预约任务Service接口
@@ -66,4 +67,12 @@ public interface IFAppointmentTaskService
      * @return 结果
      */
     public int insertFAppointmentTaskWithDocks(FAppointmentTask fAppointmentTask);
+
+    /**
+     * 签到排队
+     *
+     * @param taskId 任务ID
+     * @return 结果
+     */
+    public AjaxResult checkin(Long taskId);
 }
