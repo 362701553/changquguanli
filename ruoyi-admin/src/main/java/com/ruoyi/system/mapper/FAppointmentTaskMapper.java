@@ -53,9 +53,17 @@ public interface FAppointmentTaskMapper
 
     /**
      * 批量删除预约任务
-     * 
+     *
      * @param ids 需要删除的数据主键集合
      * @return 结果
      */
     public int deleteFAppointmentTaskByIds(Long[] ids);
+
+    /**
+     * 查询指定日期前缀的最大任务编号
+     *
+     * @param datePrefix 日期前缀（如 TASK20260527）
+     * @return 最大任务编号
+     */
+    public String selectMaxTaskCodeByDate(String datePrefix);
 }

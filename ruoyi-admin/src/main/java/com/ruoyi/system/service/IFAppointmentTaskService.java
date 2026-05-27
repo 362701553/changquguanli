@@ -53,9 +53,17 @@ public interface IFAppointmentTaskService
 
     /**
      * 删除预约任务信息
-     * 
+     *
      * @param id 预约任务主键
      * @return 结果
      */
     public int deleteFAppointmentTaskById(Long id);
+
+    /**
+     * 新增预约任务（含码头明细）
+     *
+     * @param fAppointmentTask 预约任务（包含 dockIds 列表）
+     * @return 结果
+     */
+    public int insertFAppointmentTaskWithDocks(FAppointmentTask fAppointmentTask);
 }

@@ -17,13 +17,15 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.FAppointmentTask;
+import com.ruoyi.system.domain.FAppointmentTaskDock;
 import com.ruoyi.system.service.IFAppointmentTaskService;
+import com.ruoyi.system.service.IFAppointmentTaskDockService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 预约任务Controller
- * 
+ *
  * @author ruoyi
  * @date 2026-05-26
  */
@@ -33,6 +35,9 @@ public class FAppointmentTaskController extends BaseController
 {
     @Autowired
     private IFAppointmentTaskService fAppointmentTaskService;
+
+    @Autowired
+    private IFAppointmentTaskDockService fAppointmentTaskDockService;
 
     /**
      * 查询预约任务列表
@@ -60,24 +65,30 @@ public class FAppointmentTaskController extends BaseController
     }
 
     /**
-     * 获取预约任务详细信息
+     * 获取预约任务详细信息（含码头明细）
      */
     @PreAuthorize("@ss.hasPermi('system:task:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
-        return AjaxResult.success(fAppointmentTaskService.selectFAppointmentTaskById(id));
+        FAppointmentTask task = fAppointmentTaskService.selectFAppointmentTaskById(id);
+        FAppointmentTaskDock query = new FAppointmentTaskDock();
+        query.setTaskId(id);
+        List<FAppointmentTaskDock> dockList = fAppointmentTaskDockService.selectFAppointmentTaskDockList(query);
+        AjaxResult ajax = AjaxResult.success(task);
+        ajax.put("dockList", dockList);
+        return ajax;
     }
 
     /**
-     * 新增预约任务
+     * 新增预约任务（含码头明细）
      */
     @PreAuthorize("@ss.hasPermi('system:task:add')")
     @Log(title = "预约任务", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody FAppointmentTask fAppointmentTask)
     {
-        return toAjax(fAppointmentTaskService.insertFAppointmentTask(fAppointmentTask));
+        return toAjax(fAppointmentTaskService.insertFAppointmentTaskWithDocks(fAppointmentTask));
     }
 
     /**
@@ -96,7 +107,7 @@ public class FAppointmentTaskController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:task:remove')")
     @Log(title = "预约任务", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(fAppointmentTaskService.deleteFAppointmentTaskByIds(ids));

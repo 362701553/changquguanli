@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 查询预约任务-码头明细列表
+// 查询码头列表
 export function listDock(query) {
   return request({
     url: '/system/dock/list',
@@ -9,7 +9,7 @@ export function listDock(query) {
   })
 }
 
-// 查询预约任务-码头明细详细
+// 查询码头详细
 export function getDock(id) {
   return request({
     url: '/system/dock/' + id,
@@ -17,7 +17,7 @@ export function getDock(id) {
   })
 }
 
-// 新增预约任务-码头明细
+// 新增码头
 export function addDock(data) {
   return request({
     url: '/system/dock',
@@ -26,7 +26,7 @@ export function addDock(data) {
   })
 }
 
-// 修改预约任务-码头明细
+// 修改码头
 export function updateDock(data) {
   return request({
     url: '/system/dock',
@@ -35,7 +35,7 @@ export function updateDock(data) {
   })
 }
 
-// 删除预约任务-码头明细
+// 删除码头
 export function delDock(id) {
   return request({
     url: '/system/dock/' + id,

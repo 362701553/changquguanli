@@ -2,6 +2,7 @@ package com.ruoyi.system.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -164,13 +165,13 @@ public class FAppointmentTask extends BaseEntity
     private String checkoutGateName;
 
     /** 预约时段开始 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "预约时段开始", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "预约时段开始", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date appointmentStart;
 
     /** 预约时段结束 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "预约时段结束", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "预约时段结束", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date appointmentEnd;
 
     /** 预约提交时间 */
@@ -278,7 +279,18 @@ public class FAppointmentTask extends BaseEntity
     @Excel(name = "审核备注")
     private String reviewNotes;
 
-    public void setId(Long id) 
+    /** 选中的码头ID列表（非持久化，仅用于新增传参） */
+    private List<Long> dockIds;
+
+    public List<Long> getDockIds() {
+        return dockIds;
+    }
+
+    public void setDockIds(List<Long> dockIds) {
+        this.dockIds = dockIds;
+    }
+
+    public void setId(Long id)
     {
         this.id = id;
     }
