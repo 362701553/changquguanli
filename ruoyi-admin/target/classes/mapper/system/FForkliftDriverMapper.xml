@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FForkliftDriverMapper">
+    
+    <resultMap type="FForkliftDriver" id="FForkliftDriverResult">
+        <result property="myRowId"    column="my_row_id"    />
+        <result property="driverId"    column="driver_id"    />
+        <result property="forkliftId"    column="forklift_id"    />
+        <result property="forkliftCode"    column="forklift_code"    />
+        <result property="driverName"    column="driver_name"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectFForkliftDriverVo">
+        select my_row_id, driver_id, forklift_id, forklift_code, driver_name, status from f_forklift_driver
+    </sql>
+
+    <select id="selectFForkliftDriverList" parameterType="FForkliftDriver" resultMap="FForkliftDriverResult">
+        <include refid="selectFForkliftDriverVo"/>
+        <where>  
+            <if test="driverId != null "> and driver_id = #{driverId}</if>
+            <if test="forkliftId != null "> and forklift_id = #{forkliftId}</if>
+            <if test="forkliftCode != null  and forkliftCode != ''"> and forklift_code = #{forkliftCode}</if>
+            <if test="driverName != null  and driverName != ''"> and driver_name like concat('%', #{driverName}, '%')</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectFForkliftDriverByMyRowId" parameterType="String" resultMap="FForkliftDriverResult">
+        <include refid="selectFForkliftDriverVo"/>
+        where my_row_id = #{myRowId}
+    </select>
+        
+    <insert id="insertFForkliftDriver" parameterType="FForkliftDriver">
+        insert into f_forklift_driver
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="myRowId != null">my_row_id,</if>
+            <if test="driverId != null">driver_id,</if>
+            <if test="forkliftId != null">forklift_id,</if>
+            <if test="forkliftCode != null">forklift_code,</if>
+            <if test="driverName != null">driver_name,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="myRowId != null">#{myRowId},</if>
+            <if test="driverId != null">#{driverId},</if>
+            <if test="forkliftId != null">#{forkliftId},</if>
+            <if test="forkliftCode != null">#{forkliftCode},</if>
+            <if test="driverName != null">#{driverName},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFForkliftDriver" parameterType="FForkliftDriver">
+        update f_forklift_driver
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="driverId != null">driver_id = #{driverId},</if>
+            <if test="forkliftId != null">forklift_id = #{forkliftId},</if>
+            <if test="forkliftCode != null">forklift_code = #{forkliftCode},</if>
+            <if test="driverName != null">driver_name = #{driverName},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where my_row_id = #{myRowId}
+    </update>
+
+    <delete id="deleteFForkliftDriverByMyRowId" parameterType="String">
+        delete from f_forklift_driver where my_row_id = #{myRowId}
+    </delete>
+
+    <delete id="deleteFForkliftDriverByMyRowIds" parameterType="String">
+        delete from f_forklift_driver where my_row_id in 
+        <foreach item="myRowId" collection="array" open="(" separator="," close=")">
+            #{myRowId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FForkliftDriverBaseMapper">
+    
+    <resultMap type="FForkliftDriverBase" id="FForkliftDriverBaseResult">
+        <result property="id"    column="id"    />
+        <result property="driverName"    column="driver_name"    />
+        <result property="driverPhone"    column="driver_phone"    />
+        <result property="driverStatus"    column="driver_status"    />
+        <result property="factoryId"    column="factory_id"    />
+        <result property="factoryName"    column="factory_name"    />
+        <result property="areaId"    column="area_id"    />
+        <result property="areaName"    column="area_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateDate"    column="update_date"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="account"    column="account"    />
+        <result property="password"    column="password"    />
+        <result property="userId"    column="user_id"    />
+    </resultMap>
+
+    <sql id="selectFForkliftDriverBaseVo">
+        select id, driver_name, driver_phone, driver_status, factory_id, factory_name, area_id, area_name, dept_id, create_by, create_date, update_by, update_date, deleted, account, password, user_id from f_forklift_driver_base
+    </sql>
+
+    <select id="selectFForkliftDriverBaseList" parameterType="FForkliftDriverBase" resultMap="FForkliftDriverBaseResult">
+        <include refid="selectFForkliftDriverBaseVo"/>
+        <where>  
+            <if test="driverName != null  and driverName != ''"> and driver_name like concat('%', #{driverName}, '%')</if>
+            <if test="driverPhone != null  and driverPhone != ''"> and driver_phone = #{driverPhone}</if>
+            <if test="driverStatus != null  and driverStatus != ''"> and driver_status = #{driverStatus}</if>
+            <if test="factoryId != null "> and factory_id = #{factoryId}</if>
+            <if test="factoryName != null  and factoryName != ''"> and factory_name like concat('%', #{factoryName}, '%')</if>
+            <if test="areaId != null "> and area_id = #{areaId}</if>
+            <if test="areaName != null  and areaName != ''"> and area_name like concat('%', #{areaName}, '%')</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="createDate != null "> and create_date = #{createDate}</if>
+            <if test="updateDate != null "> and update_date = #{updateDate}</if>
+            <if test="deleted != null "> and deleted = #{deleted}</if>
+            <if test="account != null  and account != ''"> and account = #{account}</if>
+            <if test="password != null  and password != ''"> and password = #{password}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+        </where>
+    </select>
+    
+    <select id="selectFForkliftDriverBaseById" parameterType="Long" resultMap="FForkliftDriverBaseResult">
+        <include refid="selectFForkliftDriverBaseVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertFForkliftDriverBase" parameterType="FForkliftDriverBase" useGeneratedKeys="true" keyProperty="id">
+        insert into f_forklift_driver_base
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="driverName != null">driver_name,</if>
+            <if test="driverPhone != null">driver_phone,</if>
+            <if test="driverStatus != null">driver_status,</if>
+            <if test="factoryId != null">factory_id,</if>
+            <if test="factoryName != null">factory_name,</if>
+            <if test="areaId != null">area_id,</if>
+            <if test="areaName != null">area_name,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateDate != null">update_date,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="account != null">account,</if>
+            <if test="password != null">password,</if>
+            <if test="userId != null">user_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="driverName != null">#{driverName},</if>
+            <if test="driverPhone != null">#{driverPhone},</if>
+            <if test="driverStatus != null">#{driverStatus},</if>
+            <if test="factoryId != null">#{factoryId},</if>
+            <if test="factoryName != null">#{factoryName},</if>
+            <if test="areaId != null">#{areaId},</if>
+            <if test="areaName != null">#{areaName},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateDate != null">#{updateDate},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="account != null">#{account},</if>
+            <if test="password != null">#{password},</if>
+            <if test="userId != null">#{userId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFForkliftDriverBase" parameterType="FForkliftDriverBase">
+        update f_forklift_driver_base
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="driverName != null">driver_name = #{driverName},</if>
+            <if test="driverPhone != null">driver_phone = #{driverPhone},</if>
+            <if test="driverStatus != null">driver_status = #{driverStatus},</if>
+            <if test="factoryId != null">factory_id = #{factoryId},</if>
+            <if test="factoryName != null">factory_name = #{factoryName},</if>
+            <if test="areaId != null">area_id = #{areaId},</if>
+            <if test="areaName != null">area_name = #{areaName},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateDate != null">update_date = #{updateDate},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="account != null">account = #{account},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFForkliftDriverBaseById" parameterType="Long">
+        delete from f_forklift_driver_base where id = #{id}
+    </delete>
+
+    <delete id="deleteFForkliftDriverBaseByIds" parameterType="String">
+        delete from f_forklift_driver_base where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

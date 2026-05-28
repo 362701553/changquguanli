@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FForkliftMapper">
+    
+    <resultMap type="FForklift" id="FForkliftResult">
+        <result property="id"    column="id"    />
+        <result property="forkliftCode"    column="forklift_code"    />
+        <result property="forkliftName"    column="forklift_name"    />
+        <result property="forkliftType"    column="forklift_type"    />
+        <result property="workStatus"    column="work_status"    />
+        <result property="factoryId"    column="factory_id"    />
+        <result property="factoryName"    column="factory_name"    />
+        <result property="areaId"    column="area_id"    />
+        <result property="areaName"    column="area_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateDate"    column="update_date"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="useing"    column="useing"    />
+    </resultMap>
+
+    <sql id="selectFForkliftVo">
+        select id, forklift_code, forklift_name, forklift_type, work_status, factory_id, factory_name, area_id, area_name, dept_id, create_by, create_date, update_by, update_date, deleted, useing from f_forklift
+    </sql>
+
+    <select id="selectFForkliftList" parameterType="FForklift" resultMap="FForkliftResult">
+        <include refid="selectFForkliftVo"/>
+        <where>  
+            <if test="forkliftCode != null  and forkliftCode != ''"> and forklift_code = #{forkliftCode}</if>
+            <if test="forkliftName != null  and forkliftName != ''"> and forklift_name like concat('%', #{forkliftName}, '%')</if>
+            <if test="forkliftType != null  and forkliftType != ''"> and forklift_type = #{forkliftType}</if>
+            <if test="workStatus != null  and workStatus != ''"> and work_status = #{workStatus}</if>
+            <if test="factoryId != null "> and factory_id = #{factoryId}</if>
+            <if test="factoryName != null  and factoryName != ''"> and factory_name like concat('%', #{factoryName}, '%')</if>
+            <if test="areaId != null "> and area_id = #{areaId}</if>
+            <if test="areaName != null  and areaName != ''"> and area_name like concat('%', #{areaName}, '%')</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="createDate != null "> and create_date = #{createDate}</if>
+            <if test="updateDate != null "> and update_date = #{updateDate}</if>
+            <if test="deleted != null "> and deleted = #{deleted}</if>
+            <if test="useing != null  and useing != ''"> and useing = #{useing}</if>
+        </where>
+    </select>
+    
+    <select id="selectFForkliftById" parameterType="Long" resultMap="FForkliftResult">
+        <include refid="selectFForkliftVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertFForklift" parameterType="FForklift" useGeneratedKeys="true" keyProperty="id">
+        insert into f_forklift
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="forkliftCode != null">forklift_code,</if>
+            <if test="forkliftName != null">forklift_name,</if>
+            <if test="forkliftType != null">forklift_type,</if>
+            <if test="workStatus != null">work_status,</if>
+            <if test="factoryId != null">factory_id,</if>
+            <if test="factoryName != null">factory_name,</if>
+            <if test="areaId != null">area_id,</if>
+            <if test="areaName != null">area_name,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateDate != null">update_date,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="useing != null">useing,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="forkliftCode != null">#{forkliftCode},</if>
+            <if test="forkliftName != null">#{forkliftName},</if>
+            <if test="forkliftType != null">#{forkliftType},</if>
+            <if test="workStatus != null">#{workStatus},</if>
+            <if test="factoryId != null">#{factoryId},</if>
+            <if test="factoryName != null">#{factoryName},</if>
+            <if test="areaId != null">#{areaId},</if>
+            <if test="areaName != null">#{areaName},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateDate != null">#{updateDate},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="useing != null">#{useing},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFForklift" parameterType="FForklift">
+        update f_forklift
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="forkliftCode != null">forklift_code = #{forkliftCode},</if>
+            <if test="forkliftName != null">forklift_name = #{forkliftName},</if>
+            <if test="forkliftType != null">forklift_type = #{forkliftType},</if>
+            <if test="workStatus != null">work_status = #{workStatus},</if>
+            <if test="factoryId != null">factory_id = #{factoryId},</if>
+            <if test="factoryName != null">factory_name = #{factoryName},</if>
+            <if test="areaId != null">area_id = #{areaId},</if>
+            <if test="areaName != null">area_name = #{areaName},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateDate != null">update_date = #{updateDate},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="useing != null">useing = #{useing},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFForkliftById" parameterType="Long">
+        delete from f_forklift where id = #{id}
+    </delete>
+
+    <delete id="deleteFForkliftByIds" parameterType="String">
+        delete from f_forklift where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
