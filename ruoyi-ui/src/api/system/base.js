@@ -9,10 +9,18 @@ export function listBase(query) {
   })
 }
 
-// 查询叉车司机信息详细
+// 查询叉车司机信息详细（含关联叉车）
 export function getBase(id) {
   return request({
     url: '/system/base/' + id,
+    method: 'get'
+  })
+}
+
+// 查询叉车司机详情（含关联叉车明细列表）
+export function detailBase(id) {
+  return request({
+    url: '/system/base/detail/' + id,
     method: 'get'
   })
 }

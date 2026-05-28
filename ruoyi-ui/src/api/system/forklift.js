@@ -9,6 +9,14 @@ export function listForklift(query) {
   })
 }
 
+// 查询所有叉车（下拉选项用）
+export function listAllForklift() {
+  return request({
+    url: '/system/forklift/listAll',
+    method: 'get'
+  })
+}
+
 // 查询叉车主详细
 export function getForklift(id) {
   return request({

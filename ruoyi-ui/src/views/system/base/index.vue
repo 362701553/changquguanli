@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="80px">
       <el-form-item label="司机姓名" prop="driverName">
         <el-input
           v-model="queryParams.driverName"
@@ -9,101 +9,11 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="司机联系电话" prop="driverPhone">
-        <el-input
-          v-model="queryParams.driverPhone"
-          placeholder="请输入司机联系电话"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="工厂ID" prop="factoryId">
-        <el-input
-          v-model="queryParams.factoryId"
-          placeholder="请输入工厂ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="工厂名称" prop="factoryName">
-        <el-input
-          v-model="queryParams.factoryName"
-          placeholder="请输入工厂名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="厂区ID" prop="areaId">
-        <el-input
-          v-model="queryParams.areaId"
-          placeholder="请输入厂区ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="厂区名称" prop="areaName">
-        <el-input
-          v-model="queryParams.areaName"
-          placeholder="请输入厂区名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="部门ID" prop="deptId">
-        <el-input
-          v-model="queryParams.deptId"
-          placeholder="请输入部门ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="创建时间" prop="createDate">
-        <el-date-picker clearable
-          v-model="queryParams.createDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择创建时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="修改时间" prop="updateDate">
-        <el-date-picker clearable
-          v-model="queryParams.updateDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="请选择修改时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="删除状态：0-未删除，1-已删除" prop="deleted">
-        <el-input
-          v-model="queryParams.deleted"
-          placeholder="请输入删除状态：0-未删除，1-已删除"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="账号" prop="account">
-        <el-input
-          v-model="queryParams.account"
-          placeholder="请输入账号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input
-          v-model="queryParams.password"
-          placeholder="请输入密码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="用户ID" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="状态" prop="driverStatus">
+        <el-select v-model="queryParams.driverStatus" placeholder="请选择状态" clearable>
+          <el-option label="启用" value="0" />
+          <el-option label="禁用" value="1" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -144,46 +54,33 @@
           v-hasPermi="['system:base:remove']"
         >删除</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['system:base:export']"
-        >导出</el-button>
-      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="baseList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="司机姓名" align="center" prop="driverName" />
-      <el-table-column label="司机联系电话" align="center" prop="driverPhone" />
-      <el-table-column label="状态" align="center" prop="driverStatus" />
-      <el-table-column label="工厂ID" align="center" prop="factoryId" />
-      <el-table-column label="工厂名称" align="center" prop="factoryName" />
-      <el-table-column label="厂区ID" align="center" prop="areaId" />
-      <el-table-column label="厂区名称" align="center" prop="areaName" />
-      <el-table-column label="部门ID" align="center" prop="deptId" />
-      <el-table-column label="创建时间" align="center" prop="createDate" width="180">
+      <el-table-column label="序号" type="index" width="60" align="center" />
+      <el-table-column label="叉车司机姓名" align="center" prop="driverName" />
+      <el-table-column label="状态" align="center" prop="driverStatus" width="80">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createDate, '{y}-{m}-{d}') }}</span>
+          <span v-if="scope.row.driverStatus === '0'" style="color: #67C23A">启用</span>
+          <span v-else-if="scope.row.driverStatus === '1'" style="color: #F56C6C">禁用</span>
         </template>
       </el-table-column>
-      <el-table-column label="修改时间" align="center" prop="updateDate" width="180">
+      <el-table-column label="关联叉车编号" align="center" prop="forkliftCodes">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.updateDate, '{y}-{m}-{d}') }}</span>
+          <span>{{ scope.row.forkliftCodes || '无' }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="删除状态：0-未删除，1-已删除" align="center" prop="deleted" />
-      <el-table-column label="账号" align="center" prop="account" />
-      <el-table-column label="密码" align="center" prop="password" />
-      <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
         <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleDetail(scope.row)"
+            v-hasPermi="['system:base:query']"
+          >详情</el-button>
           <el-button
             size="mini"
             type="text"
@@ -201,7 +98,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -211,56 +108,35 @@
     />
 
     <!-- 添加或修改叉车司机信息对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="司机姓名" prop="driverName">
           <el-input v-model="form.driverName" placeholder="请输入司机姓名" />
         </el-form-item>
-        <el-form-item label="司机联系电话" prop="driverPhone">
-          <el-input v-model="form.driverPhone" placeholder="请输入司机联系电话" />
-        </el-form-item>
-        <el-form-item label="工厂ID" prop="factoryId">
-          <el-input v-model="form.factoryId" placeholder="请输入工厂ID" />
-        </el-form-item>
-        <el-form-item label="工厂名称" prop="factoryName">
-          <el-input v-model="form.factoryName" placeholder="请输入工厂名称" />
-        </el-form-item>
-        <el-form-item label="厂区ID" prop="areaId">
-          <el-input v-model="form.areaId" placeholder="请输入厂区ID" />
-        </el-form-item>
-        <el-form-item label="厂区名称" prop="areaName">
-          <el-input v-model="form.areaName" placeholder="请输入厂区名称" />
-        </el-form-item>
-        <el-form-item label="部门ID" prop="deptId">
-          <el-input v-model="form.deptId" placeholder="请输入部门ID" />
-        </el-form-item>
-        <el-form-item label="创建时间" prop="createDate">
-          <el-date-picker clearable
-            v-model="form.createDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择创建时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="修改时间" prop="updateDate">
-          <el-date-picker clearable
-            v-model="form.updateDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择修改时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="删除状态：0-未删除，1-已删除" prop="deleted">
-          <el-input v-model="form.deleted" placeholder="请输入删除状态：0-未删除，1-已删除" />
+        <el-form-item label="联系电话" prop="driverPhone">
+          <el-input v-model="form.driverPhone" placeholder="请输入手机号" maxlength="11" @input="handlePhoneInput" />
         </el-form-item>
         <el-form-item label="账号" prop="account">
-          <el-input v-model="form.account" placeholder="请输入账号" />
+          <el-input v-model="form.account" placeholder="默认为联系电话，可修改" />
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" placeholder="请输入密码" />
+        <el-form-item label="密码" prop="password" v-if="form.id == null">
+          <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
         </el-form-item>
-        <el-form-item label="用户ID" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户ID" />
+        <el-form-item label="状态" prop="driverStatus">
+          <el-select v-model="form.driverStatus" placeholder="请选择状态">
+            <el-option label="启用" value="0" />
+            <el-option label="禁用" value="1" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="关联叉车" prop="forkliftIds">
+          <el-select v-model="form.forkliftIds" multiple placeholder="请选择关联叉车" style="width: 100%">
+            <el-option
+              v-for="item in forkliftOptions"
+              :key="item.id"
+              :label="item.forkliftCode"
+              :value="item.id"
+            />
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -268,65 +144,81 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 详情对话框 -->
+    <el-dialog title="叉车司机详情" :visible.sync="detailOpen" width="650px" append-to-body>
+      <el-descriptions :column="2" border size="medium">
+        <el-descriptions-item label="司机姓名">{{ detailInfo.driverName }}</el-descriptions-item>
+        <el-descriptions-item label="联系电话">{{ detailInfo.driverPhone }}</el-descriptions-item>
+        <el-descriptions-item label="状态">
+          <span v-if="detailInfo.driverStatus === '0'" style="color: #67C23A">启用</span>
+          <span v-else-if="detailInfo.driverStatus === '1'" style="color: #F56C6C">禁用</span>
+        </el-descriptions-item>
+        <el-descriptions-item label="账号">{{ detailInfo.account }}</el-descriptions-item>
+      </el-descriptions>
+      <div style="margin-top: 20px">
+        <h4 style="margin-bottom: 10px">关联叉车列表</h4>
+        <el-table :data="detailInfo.forkliftList" border size="small" empty-text="暂无关联叉车">
+          <el-table-column label="序号" type="index" width="60" align="center" />
+          <el-table-column label="叉车编号" align="center" prop="forkliftCode" />
+          <el-table-column label="状态" align="center" prop="status" width="80">
+            <template slot-scope="scope">
+              <span v-if="scope.row.status === '0'">正常</span>
+              <span v-else>停用</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="detailOpen = false">关 闭</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listBase, getBase, delBase, addBase, updateBase } from "@/api/system/base";
+import { listBase, getBase, detailBase, delBase, addBase, updateBase } from "@/api/system/base";
+import { listAllForklift } from "@/api/system/forklift";
 
 export default {
   name: "Base",
   data() {
     return {
-      // 遮罩层
       loading: true,
-      // 选中数组
       ids: [],
-      // 非单个禁用
       single: true,
-      // 非多个禁用
       multiple: true,
-      // 显示搜索条件
       showSearch: true,
-      // 总条数
       total: 0,
-      // 叉车司机信息表格数据
       baseList: [],
-      // 弹出层标题
+      forkliftOptions: [],
       title: "",
-      // 是否显示弹出层
       open: false,
-      // 查询参数
+      detailOpen: false,
+      detailInfo: {},
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         driverName: null,
-        driverPhone: null,
-        driverStatus: null,
-        factoryId: null,
-        factoryName: null,
-        areaId: null,
-        areaName: null,
-        deptId: null,
-        createDate: null,
-        updateDate: null,
-        deleted: null,
-        account: null,
-        password: null,
-        userId: null
+        driverStatus: null
       },
-      // 表单参数
       form: {},
-      // 表单校验
       rules: {
+        driverName: [{ required: true, message: "司机姓名不能为空", trigger: "blur" }],
+        driverPhone: [
+          { required: true, message: "联系电话不能为空", trigger: "blur" },
+          { pattern: /^\d+$/, message: "联系电话只能输入数字", trigger: "blur" },
+          { pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号格式", trigger: "blur" }
+        ],
+        password: [{ required: true, message: "密码不能为空", trigger: "blur" }]
       }
     };
   },
   created() {
     this.getList();
+    this.getForkliftOptions();
   },
   methods: {
-    /** 查询叉车司机信息列表 */
     getList() {
       this.loading = true;
       listBase(this.queryParams).then(response => {
@@ -335,67 +227,76 @@ export default {
         this.loading = false;
       });
     },
-    // 取消按钮
+    getForkliftOptions() {
+      listAllForklift().then(response => {
+        this.forkliftOptions = response.data;
+      });
+    },
     cancel() {
       this.open = false;
       this.reset();
     },
-    // 表单重置
     reset() {
       this.form = {
         id: null,
         driverName: null,
         driverPhone: null,
         driverStatus: "0",
-        factoryId: null,
-        factoryName: null,
-        areaId: null,
-        areaName: null,
-        deptId: null,
-        createBy: null,
-        createDate: null,
-        updateBy: null,
-        updateDate: null,
-        deleted: null,
         account: null,
         password: null,
-        userId: null
+        forkliftIds: []
       };
       this.resetForm("form");
     },
-    /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
-    /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
-    /** 新增按钮操作 */
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加叉车司机信息";
+      this.title = "添加叉车司机";
     },
-    /** 修改按钮操作 */
+    handlePhoneInput(val) {
+      // 只保留数字
+      this.form.driverPhone = val.replace(/\D/g, '');
+      // 自动赋值到账号（如果账号为空或账号等于旧手机号）
+      if (!this.form.account || this.form.account === this.form._lastPhone) {
+        this.form.account = this.form.driverPhone;
+      }
+      this.form._lastPhone = this.form.driverPhone;
+    },
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
       getBase(id).then(response => {
         this.form = response.data;
+        this.form.password = null;
+        if (!this.form.forkliftIds) {
+          this.form.forkliftIds = [];
+        }
         this.open = true;
-        this.title = "修改叉车司机信息";
+        this.title = "修改叉车司机";
       });
     },
-    /** 提交按钮 */
+    handleDetail(row) {
+      detailBase(row.id).then(response => {
+        this.detailInfo = response.data;
+        if (!this.detailInfo.forkliftList) {
+          this.detailInfo.forkliftList = [];
+        }
+        this.detailOpen = true;
+      });
+    },
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
@@ -415,21 +316,14 @@ export default {
         }
       });
     },
-    /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$modal.confirm('是否确认删除叉车司机信息编号为"' + ids + '"的数据项？').then(function() {
+      this.$modal.confirm('是否确认删除叉车司机"' + (row.driverName || ids) + '"的数据项？').then(function() {
         return delBase(ids);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      this.download('system/base/export', {
-        ...this.queryParams
-      }, `base_${new Date().getTime()}.xlsx`)
     }
   }
 };

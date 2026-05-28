@@ -23,7 +23,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 
 /**
  * 叉车司机信息Controller
- * 
+ *
  * @author ruoyi
  * @date 2026-05-28
  */
@@ -47,24 +47,21 @@ public class FForkliftDriverBaseController extends BaseController
     }
 
     /**
-     * 导出叉车司机信息列表
-     */
-    @PreAuthorize("@ss.hasPermi('system:base:export')")
-    @Log(title = "叉车司机信息", businessType = BusinessType.EXPORT)
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, FForkliftDriverBase fForkliftDriverBase)
-    {
-        List<FForkliftDriverBase> list = fForkliftDriverBaseService.selectFForkliftDriverBaseList(fForkliftDriverBase);
-        ExcelUtil<FForkliftDriverBase> util = new ExcelUtil<FForkliftDriverBase>(FForkliftDriverBase.class);
-        util.exportExcel(response, list, "叉车司机信息数据");
-    }
-
-    /**
-     * 获取叉车司机信息详细信息
+     * 获取叉车司机信息详细信息（含关联叉车列表）
      */
     @PreAuthorize("@ss.hasPermi('system:base:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
+    {
+        return AjaxResult.success(fForkliftDriverBaseService.selectFForkliftDriverBaseById(id));
+    }
+
+    /**
+     * 获取叉车司机详情（含关联叉车明细列表）
+     */
+    @PreAuthorize("@ss.hasPermi('system:base:query')")
+    @GetMapping(value = "/detail/{id}")
+    public AjaxResult detail(@PathVariable("id") Long id)
     {
         return AjaxResult.success(fForkliftDriverBaseService.selectFForkliftDriverBaseById(id));
     }
@@ -96,7 +93,7 @@ public class FForkliftDriverBaseController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:base:remove')")
     @Log(title = "叉车司机信息", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
+    @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(fForkliftDriverBaseService.deleteFForkliftDriverBaseByIds(ids));

@@ -53,9 +53,17 @@ public interface FForkliftDriverMapper
 
     /**
      * 批量删除叉车-司机关联
-     * 
+     *
      * @param myRowIds 需要删除的数据主键集合
      * @return 结果
      */
     public int deleteFForkliftDriverByMyRowIds(String[] myRowIds);
+
+    /**
+     * 根据司机ID删除关联
+     *
+     * @param driverId 司机ID
+     * @return 结果
+     */
+    public int deleteFForkliftDriverByDriverId(Long driverId);
 }

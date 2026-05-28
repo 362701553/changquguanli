@@ -47,6 +47,16 @@ public class FForkliftController extends BaseController
     }
 
     /**
+     * 查询所有叉车（下拉选项用）
+     */
+    @GetMapping("/listAll")
+    public AjaxResult listAll(FForklift fForklift)
+    {
+        List<FForklift> list = fForkliftService.selectFForkliftList(fForklift);
+        return AjaxResult.success(list);
+    }
+
+    /**
      * 导出叉车主列表
      */
     @PreAuthorize("@ss.hasPermi('system:forklift:export')")
