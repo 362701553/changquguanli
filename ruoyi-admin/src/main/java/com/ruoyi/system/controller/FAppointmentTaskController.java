@@ -18,8 +18,10 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.FAppointmentTask;
 import com.ruoyi.system.domain.FAppointmentTaskDock;
+import com.ruoyi.system.domain.FAppointmentTaskCompanion;
 import com.ruoyi.system.service.IFAppointmentTaskService;
 import com.ruoyi.system.service.IFAppointmentTaskDockService;
+import com.ruoyi.system.mapper.FAppointmentTaskCompanionMapper;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -38,6 +40,9 @@ public class FAppointmentTaskController extends BaseController
 
     @Autowired
     private IFAppointmentTaskDockService fAppointmentTaskDockService;
+
+    @Autowired
+    private FAppointmentTaskCompanionMapper fAppointmentTaskCompanionMapper;
 
     /**
      * 查询预约任务列表
@@ -75,20 +80,22 @@ public class FAppointmentTaskController extends BaseController
         FAppointmentTaskDock query = new FAppointmentTaskDock();
         query.setTaskId(id);
         List<FAppointmentTaskDock> dockList = fAppointmentTaskDockService.selectFAppointmentTaskDockList(query);
+        List<FAppointmentTaskCompanion> companionList = fAppointmentTaskCompanionMapper.selectByTaskId(id);
         AjaxResult ajax = AjaxResult.success(task);
         ajax.put("dockList", dockList);
+        ajax.put("companionList", companionList);
         return ajax;
     }
 
     /**
-     * 新增预约任务（含码头明细）
+     * 新增预约任务（含码头明细和随行人员）
      */
     @PreAuthorize("@ss.hasPermi('system:task:add')")
     @Log(title = "预约任务", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody FAppointmentTask fAppointmentTask)
     {
-        return toAjax(fAppointmentTaskService.insertFAppointmentTaskWithDocks(fAppointmentTask));
+        return fAppointmentTaskService.insertFAppointmentTaskWithDocks(fAppointmentTask);
     }
 
     /**

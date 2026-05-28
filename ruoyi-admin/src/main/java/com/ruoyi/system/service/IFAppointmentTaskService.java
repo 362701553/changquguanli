@@ -61,12 +61,12 @@ public interface IFAppointmentTaskService
     public int deleteFAppointmentTaskById(Long id);
 
     /**
-     * 新增预约任务（含码头明细）
+     * 新增预约任务（含码头明细和随行人员）
      *
-     * @param fAppointmentTask 预约任务（包含 dockIds 列表）
+     * @param fAppointmentTask 预约任务（包含 dockIds 列表和 companions 列表）
      * @return 结果
      */
-    public int insertFAppointmentTaskWithDocks(FAppointmentTask fAppointmentTask);
+    public AjaxResult insertFAppointmentTaskWithDocks(FAppointmentTask fAppointmentTask);
 
     /**
      * 签到排队

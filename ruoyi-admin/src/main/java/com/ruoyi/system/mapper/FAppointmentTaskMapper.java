@@ -1,6 +1,8 @@
 package com.ruoyi.system.mapper;
 
+import java.util.Date;
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 import com.ruoyi.system.domain.FAppointmentTask;
 
 /**
@@ -66,4 +68,8 @@ public interface FAppointmentTaskMapper
      * @return 最大任务编号
      */
     public String selectMaxTaskCodeByDate(String datePrefix);
+
+    public List<FAppointmentTask> selectConflictingTask(@Param("outDriverId") Long outDriverId,
+                                                        @Param("appointmentStart") Date appointmentStart,
+                                                        @Param("appointmentEnd") Date appointmentEnd);
 }

@@ -282,12 +282,23 @@ public class FAppointmentTask extends BaseEntity
     /** 选中的码头ID列表（非持久化，仅用于新增传参） */
     private List<Long> dockIds;
 
+    /** 随行人员列表（非持久化，仅用于新增传参） */
+    private List<FAppointmentTaskCompanion> companions;
+
     public List<Long> getDockIds() {
         return dockIds;
     }
 
     public void setDockIds(List<Long> dockIds) {
         this.dockIds = dockIds;
+    }
+
+    public List<FAppointmentTaskCompanion> getCompanions() {
+        return companions;
+    }
+
+    public void setCompanions(List<FAppointmentTaskCompanion> companions) {
+        this.companions = companions;
     }
 
     public void setId(Long id)

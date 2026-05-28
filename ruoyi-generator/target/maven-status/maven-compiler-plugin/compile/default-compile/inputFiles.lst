@@ -1,0 +1,13 @@
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/service/IGenTableService.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/domain/GenTable.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/util/GenUtils.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/service/IGenTableColumnService.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/config/GenConfig.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/util/VelocityInitializer.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/domain/GenTableColumn.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/service/GenTableColumnServiceImpl.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/service/GenTableServiceImpl.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/mapper/GenTableMapper.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/util/VelocityUtils.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/mapper/GenTableColumnMapper.java
+/Users/lipiaoliang/Documents/ziwoxiangmu/changquguanligithub/changquguanli/ruoyi-generator/src/main/java/com/ruoyi/generator/controller/GenController.java

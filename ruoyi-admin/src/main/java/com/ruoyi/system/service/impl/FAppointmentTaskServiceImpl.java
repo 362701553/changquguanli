@@ -11,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.mapper.FAppointmentTaskMapper;
 import com.ruoyi.system.mapper.FAppointmentTaskDockMapper;
+import com.ruoyi.system.mapper.FAppointmentTaskCompanionMapper;
 import com.ruoyi.system.domain.FAppointmentTask;
 import com.ruoyi.system.domain.FAppointmentTaskDock;
+import com.ruoyi.system.domain.FAppointmentTaskCompanion;
 import com.ruoyi.system.domain.FDock;
 import com.ruoyi.system.domain.FDockLoadingPoint;
 import com.ruoyi.system.domain.FDockParkingSpace;
@@ -35,6 +37,9 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
 
     @Autowired
     private FAppointmentTaskDockMapper fAppointmentTaskDockMapper;
+
+    @Autowired
+    private FAppointmentTaskCompanionMapper fAppointmentTaskCompanionMapper;
 
     @Autowired
     private IFDockService fDockService;
@@ -83,8 +88,19 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
 
     @Override
     @Transactional
-    public int insertFAppointmentTaskWithDocks(FAppointmentTask fAppointmentTask)
+    public AjaxResult insertFAppointmentTaskWithDocks(FAppointmentTask fAppointmentTask)
     {
+        // 0. 校验司机预约时间冲突
+        List<FAppointmentTask> conflicting = fAppointmentTaskMapper.selectConflictingTask(
+                fAppointmentTask.getOutDriverId(),
+                fAppointmentTask.getAppointmentStart(),
+                fAppointmentTask.getAppointmentEnd());
+        if (conflicting != null && !conflicting.isEmpty())
+        {
+            FAppointmentTask exist = conflicting.get(0);
+            return AjaxResult.error("该司机在所选时间段内已有预约任务（" + exist.getTaskCode() + "），请选择其他时间段");
+        }
+
         // 1. 生成任务编号 TASK + yyyyMMdd + 4位序号
         String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
         String datePrefix = "TASK" + today;
@@ -103,7 +119,7 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
         fAppointmentTask.setCreateDate(new Date());
 
         // 3. 插入主任务
-        int rows = fAppointmentTaskMapper.insertFAppointmentTask(fAppointmentTask);
+        fAppointmentTaskMapper.insertFAppointmentTask(fAppointmentTask);
 
         // 4. 插入码头明细
         if (fAppointmentTask.getDockIds() != null && !fAppointmentTask.getDockIds().isEmpty())
@@ -126,7 +142,19 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
                 fAppointmentTaskDockMapper.insertFAppointmentTaskDock(taskDock);
             }
         }
-        return rows;
+
+        // 5. 插入随行人员明细
+        if (fAppointmentTask.getCompanions() != null && !fAppointmentTask.getCompanions().isEmpty())
+        {
+            for (FAppointmentTaskCompanion companion : fAppointmentTask.getCompanions())
+            {
+                companion.setTaskId(fAppointmentTask.getId());
+                companion.setCreateDate(new Date());
+                fAppointmentTaskCompanionMapper.insertFAppointmentTaskCompanion(companion);
+            }
+        }
+
+        return AjaxResult.success("新增成功");
     }
 
     @Override

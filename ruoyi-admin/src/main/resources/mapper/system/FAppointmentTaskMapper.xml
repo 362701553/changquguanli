@@ -369,4 +369,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectMaxTaskCodeByDate" parameterType="String" resultType="String">
         SELECT MAX(task_code) FROM f_appointment_task WHERE task_code LIKE CONCAT(#{datePrefix}, '%')
     </select>
+
+    <select id="selectConflictingTask" resultMap="FAppointmentTaskResult">
+        <include refid="selectFAppointmentTaskVo"/>
+        WHERE out_driver_id = #{outDriverId}
+          AND task_status IN ('0','1','2','4','5')
+          AND appointment_start &lt; #{appointmentEnd}
+          AND appointment_end &gt; #{appointmentStart}
+        LIMIT 1
+    </select>
 </mapper>

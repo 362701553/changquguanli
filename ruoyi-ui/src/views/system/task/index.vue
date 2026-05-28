@@ -139,7 +139,7 @@
     />
 
     <!-- 新增预约任务对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="750px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="选择司机" prop="outDriverId">
           <el-select v-model="form.outDriverId" placeholder="请选择司机" filterable style="width: 100%;" @change="handleDriverChange">
@@ -198,6 +198,37 @@
             />
           </el-select>
         </el-form-item>
+        <el-divider content-position="left">随行人员</el-divider>
+        <el-row style="margin-bottom: 10px;">
+          <el-button type="primary" size="small" icon="el-icon-plus" @click="addCompanionRow">新增随行人员</el-button>
+        </el-row>
+        <el-table :data="form.companions" border size="small" style="width: 100%;">
+          <el-table-column label="姓名" min-width="100">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.name" placeholder="姓名" size="small" />
+            </template>
+          </el-table-column>
+          <el-table-column label="国家" min-width="100">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.country" placeholder="国家" size="small" />
+            </template>
+          </el-table-column>
+          <el-table-column label="联系电话" min-width="120">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.phone" placeholder="联系电话" size="small" oninput="value=value.replace(/[^\d\+\-]/g,'')" />
+            </template>
+          </el-table-column>
+          <el-table-column label="身份证后四位" min-width="110">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.idCardLastFour" placeholder="后四位" size="small" maxlength="4" oninput="value=value.replace(/[^\dXx]/g,'')" />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="60" align="center">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" icon="el-icon-delete" @click="removeCompanionRow(scope.$index)" />
+            </template>
+          </el-table-column>
+        </el-table>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -286,6 +317,16 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <el-divider content-position="left">随行人员</el-divider>
+      <el-table :data="viewCompanionList" border size="small" style="width: 100%;">
+        <el-table-column label="序号" type="index" width="60" align="center" />
+        <el-table-column label="姓名" align="center" prop="name" min-width="100" />
+        <el-table-column label="国家" align="center" prop="country" min-width="100" />
+        <el-table-column label="联系电话" align="center" prop="phone" min-width="120" />
+        <el-table-column label="身份证后四位" align="center" prop="idCardLastFour" min-width="110" />
+      </el-table>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="viewOpen = false">关 闭</el-button>
       </div>
@@ -343,6 +384,7 @@ export default {
       viewOpen: false,
       viewForm: {},
       viewDockList: [],
+      viewCompanionList: [],
       driverList: [],
       dockList: [],
       checkinLoading: false,
@@ -465,6 +507,7 @@ export default {
         appointmentStartTime: null,
         appointmentEndTime: null,
         dockIds: [],
+        companions: [],
         taskStatus: "0"
       };
       this.resetForm("form");
@@ -500,6 +543,7 @@ export default {
       getTask(row.id).then(response => {
         this.viewForm = response.data;
         this.viewDockList = response.dockList || [];
+        this.viewCompanionList = response.companionList || [];
         this.viewOpen = true;
       });
     },
@@ -587,16 +631,40 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          // 校验随行人员
+          const phoneReg = /^[\d\+\-]+$/;
+          const idCardReg = /^[\dXx]+$/;
+          for (let i = 0; i < this.form.companions.length; i++) {
+            const c = this.form.companions[i];
+            if (c.phone && !phoneReg.test(c.phone)) {
+              this.$modal.msgError("第" + (i + 1) + "行随行人员的联系电话格式不正确，只能输入数字、+、-");
+              return;
+            }
+            if (c.idCardLastFour && !idCardReg.test(c.idCardLastFour)) {
+              this.$modal.msgError("第" + (i + 1) + "行随行人员的身份证后四位格式不正确，只能输入数字或X");
+              return;
+            }
+          }
           const submitData = { ...this.form };
           submitData.appointmentStart = submitData.appointmentDate + ' ' + submitData.appointmentStartTime + ':00';
           submitData.appointmentEnd = submitData.appointmentDate + ' ' + submitData.appointmentEndTime + ':00';
           addTask(submitData).then(response => {
-            this.$modal.msgSuccess("新增成功");
-            this.open = false;
-            this.getList();
+            if (response.code === 200) {
+              this.$modal.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
+            } else {
+              this.$modal.msgError(response.msg);
+            }
           });
         }
       });
+    },
+    addCompanionRow() {
+      this.form.companions.push({ name: '', country: '', phone: '', idCardLastFour: '' });
+    },
+    removeCompanionRow(index) {
+      this.form.companions.splice(index, 1);
     },
     handleDelete(row) {
       const ids = row.id || this.ids;
