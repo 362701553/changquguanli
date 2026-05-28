@@ -53,9 +53,17 @@ public interface FForkliftDriverBaseMapper
 
     /**
      * 批量删除叉车司机信息
-     * 
+     *
      * @param ids 需要删除的数据主键集合
      * @return 结果
      */
     public int deleteFForkliftDriverBaseByIds(Long[] ids);
+
+    /**
+     * 根据手机号查询叉车司机
+     *
+     * @param driverPhone 手机号
+     * @return 叉车司机信息
+     */
+    public FForkliftDriverBase selectFForkliftDriverBaseByPhone(String driverPhone);
 }
