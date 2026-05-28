@@ -351,6 +351,26 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
         return AjaxResult.success("点位释放成功");
     }
 
+    @Override
+    @Transactional
+    public AjaxResult checkout(Long taskId)
+    {
+        FAppointmentTask task = fAppointmentTaskMapper.selectFAppointmentTaskById(taskId);
+        if (task == null)
+        {
+            return AjaxResult.error("任务不存在");
+        }
+        if (!"5".equals(task.getTaskStatus()))
+        {
+            return AjaxResult.error("只有待签出状态的任务才能签出");
+        }
+
+        task.setTaskStatus("6");
+        fAppointmentTaskMapper.updateFAppointmentTask(task);
+
+        return AjaxResult.success("签出成功");
+    }
+
     private void processNextDockWithPriority(FAppointmentTaskDock nextDock, FAppointmentTask task)
     {
         Long dockId = nextDock.getDockId();

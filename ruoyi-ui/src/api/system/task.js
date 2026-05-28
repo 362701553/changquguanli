@@ -75,3 +75,11 @@ export function releasePoint(dockTaskId) {
     method: 'post'
   })
 }
+
+// 签出
+export function checkoutTask(id) {
+  return request({
+    url: '/system/task/checkout/' + id,
+    method: 'post'
+  })
+}

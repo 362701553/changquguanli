@@ -145,4 +145,15 @@ public class FAppointmentTaskController extends BaseController
     {
         return fAppointmentTaskService.releasePoint(dockTaskId);
     }
+
+    /**
+     * 签出
+     */
+    @PreAuthorize("@ss.hasPermi('system:task:edit')")
+    @Log(title = "预约任务签出", businessType = BusinessType.UPDATE)
+    @PostMapping("/checkout/{id}")
+    public AjaxResult checkout(@PathVariable("id") Long id)
+    {
+        return fAppointmentTaskService.checkout(id);
+    }
 }

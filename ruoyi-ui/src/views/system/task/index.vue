@@ -25,6 +25,7 @@
           <el-option label="已完成" value="3" />
           <el-option label="待入厂" value="4" />
           <el-option label="待签出" value="5" />
+          <el-option label="已结束" value="6" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -67,6 +68,16 @@
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
+
+    <el-tabs v-model="activeTab" @tab-click="handleTabClick" style="margin-bottom: 10px;">
+      <el-tab-pane label="全部" name="all"></el-tab-pane>
+      <el-tab-pane label="待签到" name="0"></el-tab-pane>
+      <el-tab-pane label="待入厂" name="4"></el-tab-pane>
+      <el-tab-pane label="待作业" name="1"></el-tab-pane>
+      <el-tab-pane label="作业中" name="2"></el-tab-pane>
+      <el-tab-pane label="待签出" name="5"></el-tab-pane>
+      <el-tab-pane label="已结束" name="6"></el-tab-pane>
+    </el-tabs>
 
     <el-table v-loading="loading" :data="taskList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
@@ -218,6 +229,11 @@
         <el-button type="success" icon="el-icon-check" @click="handleCheckin" :loading="checkinLoading">签 到</el-button>
       </el-row>
 
+      <!-- 签出按钮区域 -->
+      <el-row style="margin-top: 16px; margin-bottom: 16px;" v-if="viewForm.taskStatus === '5'">
+        <el-button type="warning" icon="el-icon-switch-button" @click="handleCheckout" :loading="checkoutLoading">签 出</el-button>
+      </el-row>
+
       <el-divider content-position="left">装卸任务</el-divider>
       <el-row style="margin-bottom: 10px;">
         <el-button type="primary" size="small" icon="el-icon-plus" @click="handleAddLoadingTask">新增装卸任务</el-button>
@@ -307,7 +323,7 @@
 </template>
 
 <script>
-import { listTask, getTask, delTask, addTask, checkinTask, addTaskDock, startWork, releasePoint } from "@/api/system/task";
+import { listTask, getTask, delTask, addTask, checkinTask, addTaskDock, startWork, releasePoint, checkoutTask } from "@/api/system/task";
 import { listDock } from "@/api/system/dock";
 import { listVehicle } from "@/api/system/vehicle";
 
@@ -330,6 +346,8 @@ export default {
       driverList: [],
       dockList: [],
       checkinLoading: false,
+      checkoutLoading: false,
+      activeTab: "all",
       loadingTaskOpen: false,
       loadingTaskForm: {},
       loadingTaskRules: {
@@ -412,11 +430,11 @@ export default {
       }
     },
     statusText(status) {
-      const map = { '0': '待签到', '1': '待作业', '2': '作业中', '3': '已完成', '4': '待入厂', '5': '待签出' };
+      const map = { '0': '待签到', '1': '待作业', '2': '作业中', '3': '已完成', '4': '待入厂', '5': '待签出', '6': '已结束' };
       return map[status] || '未知';
     },
     statusTagType(status) {
-      const map = { '0': 'info', '1': 'warning', '2': '', '3': 'success', '4': 'danger', '5': 'warning' };
+      const map = { '0': 'info', '1': 'warning', '2': '', '3': 'success', '4': 'danger', '5': 'warning', '6': 'success' };
       return map[status] || 'info';
     },
     dockStatusText(status) {
@@ -455,6 +473,15 @@ export default {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    handleTabClick(tab) {
+      if (tab.name === 'all') {
+        this.queryParams.taskStatus = null;
+      } else {
+        this.queryParams.taskStatus = tab.name;
+      }
+      this.queryParams.pageNum = 1;
+      this.getList();
+    },
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
@@ -482,11 +509,23 @@ export default {
         checkinTask(this.viewForm.id).then(response => {
           this.$modal.msgSuccess(response.msg || "签到成功");
           this.checkinLoading = false;
-          // 刷新详情数据
           this.handleView(this.viewForm);
           this.getList();
         }).catch(() => {
           this.checkinLoading = false;
+        });
+      }).catch(() => {});
+    },
+    handleCheckout() {
+      this.$modal.confirm('确认对该任务进行签出操作？签出后任务将结束。').then(() => {
+        this.checkoutLoading = true;
+        checkoutTask(this.viewForm.id).then(response => {
+          this.$modal.msgSuccess(response.msg || "签出成功");
+          this.checkoutLoading = false;
+          this.handleView(this.viewForm);
+          this.getList();
+        }).catch(() => {
+          this.checkoutLoading = false;
         });
       }).catch(() => {});
     },

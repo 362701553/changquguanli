@@ -91,4 +91,12 @@ public interface IFAppointmentTaskService
      * @return 结果
      */
     public AjaxResult releasePoint(Long dockTaskId);
+
+    /**
+     * 签出
+     *
+     * @param taskId 任务ID
+     * @return 结果
+     */
+    public AjaxResult checkout(Long taskId);
 }
