@@ -72,6 +72,12 @@
           <span>{{ scope.row.forkliftCodes || '无' }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="作业状态" align="center" prop="workStatus" width="90">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.workStatus === '1'" type="danger" size="small">作业中</el-tag>
+          <el-tag v-else type="success" size="small">待作业</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
         <template slot-scope="scope">
           <el-button
@@ -155,6 +161,10 @@
           <span v-else-if="detailInfo.driverStatus === '1'" style="color: #F56C6C">禁用</span>
         </el-descriptions-item>
         <el-descriptions-item label="账号">{{ detailInfo.account }}</el-descriptions-item>
+        <el-descriptions-item label="作业状态">
+          <el-tag v-if="detailInfo.workStatus === '1'" type="danger" size="small">作业中</el-tag>
+          <el-tag v-else type="success" size="small">待作业</el-tag>
+        </el-descriptions-item>
       </el-descriptions>
       <div style="margin-top: 20px">
         <h4 style="margin-bottom: 10px">关联叉车列表</h4>

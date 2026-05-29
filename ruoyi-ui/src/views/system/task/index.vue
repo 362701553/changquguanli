@@ -304,9 +304,9 @@
               v-if="scope.row.workStatus === '0' && scope.row.loadingPointId"
               size="mini"
               type="text"
-              icon="el-icon-video-play"
-              @click="handleStartWork(scope.row)"
-            >作业</el-button>
+              icon="el-icon-user"
+              @click="handleAssignDriver(scope.row)"
+            >指派</el-button>
             <el-button
               v-if="scope.row.workStatus === '1'"
               size="mini"
@@ -360,11 +360,31 @@
         <el-button @click="loadingTaskOpen = false">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 指派叉车司机弹窗 -->
+    <el-dialog title="指派叉车司机" :visible.sync="assignDialogVisible" width="600px" append-to-body>
+      <el-table v-loading="driverLoading" :data="availableDriverList" border>
+        <el-table-column label="司机姓名" align="center" prop="driverName" />
+        <el-table-column label="联系电话" align="center" prop="driverPhone" />
+        <el-table-column label="关联叉车" align="center" prop="forkliftCodes" />
+        <el-table-column label="操作" align="center" width="80">
+          <template slot-scope="scope">
+            <el-button size="mini" type="primary" @click="confirmAssign(scope.row)">选择</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div v-if="availableDriverList.length === 0 && !driverLoading" style="text-align: center; padding: 20px; color: #909399;">
+        暂无可用叉车司机
+      </div>
+      <div slot="footer">
+        <el-button @click="assignDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listTask, getTask, delTask, addTask, checkinTask, addTaskDock, startWork, releasePoint, checkoutTask } from "@/api/system/task";
+import { listTask, getTask, delTask, addTask, checkinTask, addTaskDock, releasePoint, checkoutTask, getAvailableDrivers, assignDriver } from "@/api/system/task";
 import { listDock } from "@/api/system/dock";
 import { listVehicle } from "@/api/system/vehicle";
 
@@ -391,6 +411,10 @@ export default {
       checkoutLoading: false,
       activeTab: "all",
       loadingTaskOpen: false,
+      assignDialogVisible: false,
+      driverLoading: false,
+      availableDriverList: [],
+      currentAssignRow: null,
       loadingTaskForm: {},
       loadingTaskRules: {
         dockId: [{ required: true, message: "请选择码头", trigger: "change" }],
@@ -573,10 +597,22 @@ export default {
         });
       }).catch(() => {});
     },
-    handleStartWork(row) {
-      this.$modal.confirm('确认开始作业？').then(() => {
-        startWork(row.id).then(response => {
-          this.$modal.msgSuccess(response.msg || "操作成功");
+    handleAssignDriver(row) {
+      this.currentAssignRow = row;
+      this.assignDialogVisible = true;
+      this.driverLoading = true;
+      getAvailableDrivers().then(response => {
+        this.availableDriverList = response.data || [];
+        this.driverLoading = false;
+      }).catch(() => {
+        this.driverLoading = false;
+      });
+    },
+    confirmAssign(driver) {
+      this.$modal.confirm('确认指派叉车司机 ' + driver.driverName + ' ？').then(() => {
+        assignDriver(this.currentAssignRow.id, driver.id).then(response => {
+          this.$modal.msgSuccess(response.msg || "指派成功");
+          this.assignDialogVisible = false;
           this.handleView(this.viewForm);
           this.getList();
         });

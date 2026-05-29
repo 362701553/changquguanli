@@ -99,4 +99,13 @@ public interface IFAppointmentTaskService
      * @return 结果
      */
     public AjaxResult checkout(Long taskId);
+
+    /**
+     * 指派叉车司机
+     *
+     * @param dockTaskId 码头任务ID
+     * @param driverId 叉车司机ID
+     * @return 结果
+     */
+    public AjaxResult assignForkliftDriver(Long dockTaskId, Long driverId);
 }

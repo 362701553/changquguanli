@@ -1,6 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+import java.util.Map;
 import com.ruoyi.system.domain.FForkliftDriverBase;
 
 /**
@@ -66,4 +67,11 @@ public interface FForkliftDriverBaseMapper
      * @return 叉车司机信息
      */
     public FForkliftDriverBase selectFForkliftDriverBaseByPhone(String driverPhone);
+
+    /**
+     * 查询可用叉车司机列表（有关联叉车且work_status为待作业）
+     *
+     * @return 可用叉车司机列表
+     */
+    public List<Map<String, Object>> selectAvailableDrivers();
 }

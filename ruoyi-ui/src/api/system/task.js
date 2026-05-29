@@ -83,3 +83,19 @@ export function checkoutTask(id) {
     method: 'post'
   })
 }
+
+// 获取可用叉车司机列表
+export function getAvailableDrivers() {
+  return request({
+    url: '/system/task/availableDrivers',
+    method: 'get'
+  })
+}
+
+// 指派叉车司机
+export function assignDriver(dockTaskId, driverId) {
+  return request({
+    url: '/system/task/assignDriver/' + dockTaskId + '/' + driverId,
+    method: 'post'
+  })
+}

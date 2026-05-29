@@ -22,6 +22,7 @@ import com.ruoyi.system.domain.FAppointmentTaskCompanion;
 import com.ruoyi.system.service.IFAppointmentTaskService;
 import com.ruoyi.system.service.IFAppointmentTaskDockService;
 import com.ruoyi.system.mapper.FAppointmentTaskCompanionMapper;
+import com.ruoyi.system.mapper.FForkliftDriverBaseMapper;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
@@ -43,6 +44,9 @@ public class FAppointmentTaskController extends BaseController
 
     @Autowired
     private FAppointmentTaskCompanionMapper fAppointmentTaskCompanionMapper;
+
+    @Autowired
+    private FForkliftDriverBaseMapper fForkliftDriverBaseMapper;
 
     /**
      * 查询预约任务列表
@@ -162,5 +166,26 @@ public class FAppointmentTaskController extends BaseController
     public AjaxResult checkout(@PathVariable("id") Long id)
     {
         return fAppointmentTaskService.checkout(id);
+    }
+
+    /**
+     * 获取可用叉车司机列表（有关联叉车且非占用状态）
+     */
+    @PreAuthorize("@ss.hasPermi('system:task:list')")
+    @GetMapping("/availableDrivers")
+    public AjaxResult availableDrivers()
+    {
+        return AjaxResult.success(fForkliftDriverBaseMapper.selectAvailableDrivers());
+    }
+
+    /**
+     * 指派叉车司机
+     */
+    @PreAuthorize("@ss.hasPermi('system:task:edit')")
+    @Log(title = "指派叉车司机", businessType = BusinessType.UPDATE)
+    @PostMapping("/assignDriver/{dockTaskId}/{driverId}")
+    public AjaxResult assignDriver(@PathVariable("dockTaskId") Long dockTaskId, @PathVariable("driverId") Long driverId)
+    {
+        return fAppointmentTaskService.assignForkliftDriver(dockTaskId, driverId);
     }
 }

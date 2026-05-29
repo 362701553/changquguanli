@@ -148,6 +148,16 @@
           <el-tag :type="workStatusTagType(scope.row.workStatus)">{{ workStatusText(scope.row.workStatus) }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="叉车司机" align="center" min-width="100">
+        <template slot-scope="scope">
+          <span>{{ scope.row.forkliftDriverName || '-' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="叉车编号" align="center" min-width="100">
+        <template slot-scope="scope">
+          <span>{{ scope.row.forkliftNo || '-' }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="装卸开始" align="center" min-width="150">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.loadingStart, '{y}-{m}-{d} {h}:{i}') || '-' }}</span>
@@ -164,9 +174,9 @@
             v-if="scope.row.workStatus === '0' && scope.row.loadingPointId"
             size="mini"
             type="text"
-            icon="el-icon-video-play"
-            @click="handleStartWork(scope.row)"
-          >作业</el-button>
+            icon="el-icon-user"
+            @click="handleAssignDriver(scope.row)"
+          >指派</el-button>
           <el-button
             v-if="scope.row.workStatus === '1'"
             size="mini"
@@ -185,6 +195,26 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+    <!-- 指派叉车司机弹窗 -->
+    <el-dialog title="指派叉车司机" :visible.sync="assignDialogVisible" width="600px" append-to-body>
+      <el-table v-loading="driverLoading" :data="availableDriverList" border>
+        <el-table-column label="司机姓名" align="center" prop="driverName" />
+        <el-table-column label="联系电话" align="center" prop="driverPhone" />
+        <el-table-column label="关联叉车" align="center" prop="forkliftCodes" />
+        <el-table-column label="操作" align="center" width="80">
+          <template slot-scope="scope">
+            <el-button size="mini" type="primary" @click="confirmAssign(scope.row)">选择</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div v-if="availableDriverList.length === 0 && !driverLoading" style="text-align: center; padding: 20px; color: #909399;">
+        暂无可用叉车司机
+      </div>
+      <div slot="footer">
+        <el-button @click="assignDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
 
     <!-- 码头操作顺序 -->
     <el-divider content-position="left">码头操作顺序</el-divider>
@@ -226,7 +256,7 @@
 
 <script>
 import { listDock } from "@/api/system/dock";
-import { startWork, releasePoint } from "@/api/system/task";
+import { releasePoint, getAvailableDrivers, assignDriver } from "@/api/system/task";
 import request from '@/utils/request';
 
 export default {
@@ -242,6 +272,10 @@ export default {
       activeTab: "all",
       dateRange: [],
       expandedDocks: [],
+      assignDialogVisible: false,
+      driverLoading: false,
+      availableDriverList: [],
+      currentAssignRow: null,
       statCount: {
         all: 0,
         pending: 0,
@@ -409,10 +443,22 @@ export default {
       this.queryParams.workStatus = null;
       this.handleQuery();
     },
-    handleStartWork(row) {
-      this.$modal.confirm('确认开始作业？').then(() => {
-        startWork(row.id).then(response => {
-          this.$modal.msgSuccess(response.msg || "操作成功");
+    handleAssignDriver(row) {
+      this.currentAssignRow = row;
+      this.assignDialogVisible = true;
+      this.driverLoading = true;
+      getAvailableDrivers().then(response => {
+        this.availableDriverList = response.data || [];
+        this.driverLoading = false;
+      }).catch(() => {
+        this.driverLoading = false;
+      });
+    },
+    confirmAssign(driver) {
+      this.$modal.confirm('确认指派叉车司机 ' + driver.driverName + ' ？').then(() => {
+        assignDriver(this.currentAssignRow.id, driver.id).then(response => {
+          this.$modal.msgSuccess(response.msg || "指派成功");
+          this.assignDialogVisible = false;
           this.getList();
           this.loadAllForGroup();
         });

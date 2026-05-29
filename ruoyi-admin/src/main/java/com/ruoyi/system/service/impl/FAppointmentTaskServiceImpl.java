@@ -22,6 +22,12 @@ import com.ruoyi.system.service.IFAppointmentTaskService;
 import com.ruoyi.system.service.IFDockService;
 import com.ruoyi.system.service.IFDockLoadingPointService;
 import com.ruoyi.system.service.IFDockParkingSpaceService;
+import com.ruoyi.system.mapper.FForkliftDriverBaseMapper;
+import com.ruoyi.system.domain.FForkliftDriverBase;
+import com.ruoyi.system.domain.FForklift;
+import com.ruoyi.system.domain.FForkliftDriver;
+import com.ruoyi.system.mapper.FForkliftDriverMapper;
+import com.ruoyi.system.service.IFForkliftService;
 
 /**
  * 预约任务Service业务层处理
@@ -49,6 +55,15 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
 
     @Autowired
     private IFDockParkingSpaceService fDockParkingSpaceService;
+
+    @Autowired
+    private FForkliftDriverBaseMapper fForkliftDriverBaseMapper;
+
+    @Autowired
+    private FForkliftDriverMapper fForkliftDriverMapper;
+
+    @Autowired
+    private IFForkliftService fForkliftService;
 
     @Override
     public FAppointmentTask selectFAppointmentTaskById(Long id)
@@ -347,6 +362,37 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
         currentDockTask.setQueueStatus("已完成");
         fAppointmentTaskDockMapper.updateFAppointmentTaskDock(currentDockTask);
 
+        // 释放叉车司机
+        if (currentDockTask.getForkliftDriverId() != null)
+        {
+            FForkliftDriverBase driver = fForkliftDriverBaseMapper.selectFForkliftDriverBaseById(currentDockTask.getForkliftDriverId());
+            if (driver != null)
+            {
+                driver.setWorkStatus("0");
+                fForkliftDriverBaseMapper.updateFForkliftDriverBase(driver);
+            }
+            // 释放关联叉车
+            FForkliftDriver queryRelation = new FForkliftDriver();
+            queryRelation.setDriverId(currentDockTask.getForkliftDriverId());
+            queryRelation.setStatus("0");
+            List<FForkliftDriver> relations = fForkliftDriverMapper.selectFForkliftDriverList(queryRelation);
+            if (relations != null && !relations.isEmpty())
+            {
+                for (FForkliftDriver rel : relations)
+                {
+                    if (rel.getForkliftId() != null)
+                    {
+                        FForklift forklift = fForkliftService.selectFForkliftById(rel.getForkliftId());
+                        if (forklift != null && "1".equals(forklift.getWorkStatus()))
+                        {
+                            forklift.setWorkStatus("0");
+                            fForkliftService.updateFForklift(forklift);
+                        }
+                    }
+                }
+            }
+        }
+
         // 查询主任务是否有后续未处理码头
         Long taskId = currentDockTask.getTaskId();
         FAppointmentTaskDock queryDock = new FAppointmentTaskDock();
@@ -623,5 +669,85 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
                 fAppointmentTaskMapper.updateFAppointmentTask(outsideTask);
             }
         }
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult assignForkliftDriver(Long dockTaskId, Long driverId)
+    {
+        FAppointmentTaskDock dockTask = fAppointmentTaskDockMapper.selectFAppointmentTaskDockById(dockTaskId);
+        if (dockTask == null)
+        {
+            return AjaxResult.error("码头任务不存在");
+        }
+        if (!"0".equals(dockTask.getWorkStatus()))
+        {
+            return AjaxResult.error("只有待作业状态才能指派叉车司机");
+        }
+        if (dockTask.getLoadingPointId() == null)
+        {
+            return AjaxResult.error("该任务尚未分配装卸点，无法指派");
+        }
+
+        FForkliftDriverBase driver = fForkliftDriverBaseMapper.selectFForkliftDriverBaseById(driverId);
+        if (driver == null)
+        {
+            return AjaxResult.error("叉车司机不存在");
+        }
+        if (!"0".equals(driver.getDriverStatus()))
+        {
+            return AjaxResult.error("该叉车司机已被禁用");
+        }
+        if ("1".equals(driver.getWorkStatus()))
+        {
+            return AjaxResult.error("该叉车司机正在作业中，无法指派");
+        }
+
+        // 查询司机关联的叉车
+        FForkliftDriver queryRelation = new FForkliftDriver();
+        queryRelation.setDriverId(driverId);
+        queryRelation.setStatus("0");
+        List<FForkliftDriver> relations = fForkliftDriverMapper.selectFForkliftDriverList(queryRelation);
+        if (relations == null || relations.isEmpty())
+        {
+            return AjaxResult.error("该叉车司机没有关联叉车，无法指派");
+        }
+
+        // 取第一个关联叉车
+        FForkliftDriver relation = relations.get(0);
+        String forkliftCode = relation.getForkliftCode();
+
+        // 更新码头任务：指派司机信息 + 开始作业
+        dockTask.setForkliftDriverId(driverId);
+        dockTask.setForkliftDriverName(driver.getDriverName());
+        dockTask.setForkliftNo(forkliftCode);
+        dockTask.setWorkStatus("1");
+        dockTask.setLoadingStart(new Date());
+        fAppointmentTaskDockMapper.updateFAppointmentTaskDock(dockTask);
+
+        // 更新司机作业状态为"作业中"
+        driver.setWorkStatus("1");
+        fForkliftDriverBaseMapper.updateFForkliftDriverBase(driver);
+
+        // 更新叉车状态为"占用"
+        if (relation.getForkliftId() != null)
+        {
+            FForklift forklift = fForkliftService.selectFForkliftById(relation.getForkliftId());
+            if (forklift != null)
+            {
+                forklift.setWorkStatus("1");
+                fForkliftService.updateFForklift(forklift);
+            }
+        }
+
+        // 更新主任务状态为"作业中"
+        FAppointmentTask task = fAppointmentTaskMapper.selectFAppointmentTaskById(dockTask.getTaskId());
+        if (task != null)
+        {
+            task.setTaskStatus("2");
+            fAppointmentTaskMapper.updateFAppointmentTask(task);
+        }
+
+        return AjaxResult.success("指派成功");
     }
 }

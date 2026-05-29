@@ -43,6 +43,10 @@ public class FForkliftDriverBase extends BaseEntity
     /** 用户ID */
     private Long userId;
 
+    /** 作业状态（0-待作业 1-作业中） */
+    @Excel(name = "作业状态", readConverterExp = "0=待作业,1=作业中")
+    private String workStatus;
+
     /** 关联叉车ID列表（前端传入） */
     private List<Long> forkliftIds;
 
@@ -130,6 +134,16 @@ public class FForkliftDriverBase extends BaseEntity
     public Long getUserId()
     {
         return userId;
+    }
+
+    public void setWorkStatus(String workStatus)
+    {
+        this.workStatus = workStatus;
+    }
+
+    public String getWorkStatus()
+    {
+        return workStatus;
     }
 
     public List<Long> getForkliftIds()
