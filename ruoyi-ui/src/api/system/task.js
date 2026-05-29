@@ -43,10 +43,10 @@ export function delTask(id) {
   })
 }
 
-// 签到排队
-export function checkinTask(id) {
+// 绑定定位设备并签到排队
+export function checkinTask(id, deviceId) {
   return request({
-    url: '/system/task/checkin/' + id,
+    url: '/system/task/checkin/' + id + '/' + deviceId,
     method: 'post'
   })
 }

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FLocationDeviceMapper">
+
+    <resultMap type="FLocationDevice" id="FLocationDeviceResult">
+        <result property="id"    column="id"    />
+        <result property="deviceSn"    column="device_sn"    />
+        <result property="rfidTag"    column="rfid_tag"    />
+        <result property="deviceStatus"    column="device_status"    />
+        <result property="status"    column="status"    />
+        <result property="scrapReason"    column="scrap_reason"    />
+        <result property="rfidBindStatus"    column="rfid_bind_status"    />
+        <result property="deviceCategoryId"    column="device_category_id"    />
+        <result property="deviceCategory"    column="device_category"    />
+        <result property="batteryLevel"    column="battery_level"    />
+        <result property="frequency"    column="frequency"    />
+        <result property="batteryStatus"    column="battery_status"    />
+        <result property="lastBatteryUpdate"    column="last_battery_update"    />
+        <result property="productSn"    column="product_sn"    />
+        <result property="productModel"    column="product_model"    />
+        <result property="productName"    column="product_name"    />
+        <result property="areaLocation"    column="area_location"    />
+        <result property="storageLocation"    column="storage_location"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deptName"    column="dept_name"    />
+        <result property="factoryId"    column="factory_id"    />
+        <result property="factoryCode"    column="factory_code"    />
+        <result property="factoryName"    column="factory_name"    />
+        <result property="areaId"    column="area_id"    />
+        <result property="areaName"    column="area_name"    />
+        <result property="remark1"    column="remark1"    />
+        <result property="remark2"    column="remark2"    />
+        <result property="remark3"    column="remark3"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="taskId"    column="task_id"    />
+        <result property="taskCode"    column="task_code"    />
+    </resultMap>
+
+    <sql id="selectFLocationDeviceVo">
+        select id, device_sn, rfid_tag, device_status, status, scrap_reason, rfid_bind_status,
+               device_category_id, device_category, battery_level, frequency, battery_status,
+               last_battery_update, product_sn, product_model, product_name, area_location,
+               storage_location, dept_id, dept_name, factory_id, factory_code, factory_name,
+               area_id, area_name, remark1, remark2, remark3, create_by, create_time,
+               update_by, update_time, deleted, task_id, task_code
+        from f_location_device
+    </sql>
+
+    <select id="selectFLocationDeviceList" parameterType="FLocationDevice" resultMap="FLocationDeviceResult">
+        <include refid="selectFLocationDeviceVo"/>
+        <where>
+            <if test="deviceSn != null and deviceSn != ''"> and device_sn like concat('%', #{deviceSn}, '%')</if>
+            <if test="rfidTag != null and rfidTag != ''"> and rfid_tag like concat('%', #{rfidTag}, '%')</if>
+            <if test="deviceStatus != null and deviceStatus != ''"> and device_status = #{deviceStatus}</if>
+            <if test="status != null"> and status = #{status}</if>
+            <if test="rfidBindStatus != null and rfidBindStatus != ''"> and rfid_bind_status = #{rfidBindStatus}</if>
+            <if test="deviceCategoryId != null"> and device_category_id = #{deviceCategoryId}</if>
+            <if test="deviceCategory != null and deviceCategory != ''"> and device_category like concat('%', #{deviceCategory}, '%')</if>
+            <if test="batteryStatus != null and batteryStatus != ''"> and battery_status = #{batteryStatus}</if>
+            <if test="productModel != null and productModel != ''"> and product_model like concat('%', #{productModel}, '%')</if>
+            <if test="productName != null and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
+            <if test="deptId != null"> and dept_id = #{deptId}</if>
+            <if test="factoryId != null and factoryId != ''"> and factory_id = #{factoryId}</if>
+            <if test="factoryName != null and factoryName != ''"> and factory_name like concat('%', #{factoryName}, '%')</if>
+            <if test="areaId != null"> and area_id = #{areaId}</if>
+            <if test="areaName != null and areaName != ''"> and area_name like concat('%', #{areaName}, '%')</if>
+            <if test="deleted != null"> and deleted = #{deleted}</if>
+            <if test="taskId != null"> and task_id = #{taskId}</if>
+            and deleted = 0
+        </where>
+    </select>
+
+    <select id="selectFLocationDeviceById" parameterType="Long" resultMap="FLocationDeviceResult">
+        <include refid="selectFLocationDeviceVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectAvailableDevices" parameterType="FLocationDevice" resultMap="FLocationDeviceResult">
+        <include refid="selectFLocationDeviceVo"/>
+        where status = 1 and device_status = 'idle' and deleted = 0
+        <if test="deviceSn != null and deviceSn != ''"> and device_sn like concat('%', #{deviceSn}, '%')</if>
+        <if test="productName != null and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
+    </select>
+
+    <insert id="insertFLocationDevice" parameterType="FLocationDevice" useGeneratedKeys="true" keyProperty="id">
+        insert into f_location_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceSn != null and deviceSn != ''">device_sn,</if>
+            <if test="rfidTag != null">rfid_tag,</if>
+            <if test="deviceStatus != null">device_status,</if>
+            <if test="status != null">status,</if>
+            <if test="scrapReason != null">scrap_reason,</if>
+            <if test="rfidBindStatus != null">rfid_bind_status,</if>
+            <if test="deviceCategoryId != null">device_category_id,</if>
+            <if test="deviceCategory != null">device_category,</if>
+            <if test="batteryLevel != null">battery_level,</if>
+            <if test="frequency != null">frequency,</if>
+            <if test="batteryStatus != null">battery_status,</if>
+            <if test="lastBatteryUpdate != null">last_battery_update,</if>
+            <if test="productSn != null">product_sn,</if>
+            <if test="productModel != null">product_model,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="areaLocation != null">area_location,</if>
+            <if test="storageLocation != null">storage_location,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="deptName != null">dept_name,</if>
+            <if test="factoryId != null">factory_id,</if>
+            <if test="factoryCode != null">factory_code,</if>
+            <if test="factoryName != null">factory_name,</if>
+            <if test="areaId != null">area_id,</if>
+            <if test="areaName != null">area_name,</if>
+            <if test="remark1 != null">remark1,</if>
+            <if test="remark2 != null">remark2,</if>
+            <if test="remark3 != null">remark3,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="taskId != null">task_id,</if>
+            <if test="taskCode != null">task_code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceSn != null and deviceSn != ''">#{deviceSn},</if>
+            <if test="rfidTag != null">#{rfidTag},</if>
+            <if test="deviceStatus != null">#{deviceStatus},</if>
+            <if test="status != null">#{status},</if>
+            <if test="scrapReason != null">#{scrapReason},</if>
+            <if test="rfidBindStatus != null">#{rfidBindStatus},</if>
+            <if test="deviceCategoryId != null">#{deviceCategoryId},</if>
+            <if test="deviceCategory != null">#{deviceCategory},</if>
+            <if test="batteryLevel != null">#{batteryLevel},</if>
+            <if test="frequency != null">#{frequency},</if>
+            <if test="batteryStatus != null">#{batteryStatus},</if>
+            <if test="lastBatteryUpdate != null">#{lastBatteryUpdate},</if>
+            <if test="productSn != null">#{productSn},</if>
+            <if test="productModel != null">#{productModel},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="areaLocation != null">#{areaLocation},</if>
+            <if test="storageLocation != null">#{storageLocation},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="deptName != null">#{deptName},</if>
+            <if test="factoryId != null">#{factoryId},</if>
+            <if test="factoryCode != null">#{factoryCode},</if>
+            <if test="factoryName != null">#{factoryName},</if>
+            <if test="areaId != null">#{areaId},</if>
+            <if test="areaName != null">#{areaName},</if>
+            <if test="remark1 != null">#{remark1},</if>
+            <if test="remark2 != null">#{remark2},</if>
+            <if test="remark3 != null">#{remark3},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="taskId != null">#{taskId},</if>
+            <if test="taskCode != null">#{taskCode},</if>
+        </trim>
+    </insert>
+
+    <update id="updateFLocationDevice" parameterType="FLocationDevice">
+        update f_location_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceSn != null and deviceSn != ''">device_sn = #{deviceSn},</if>
+            <if test="rfidTag != null">rfid_tag = #{rfidTag},</if>
+            <if test="deviceStatus != null">device_status = #{deviceStatus},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="scrapReason != null">scrap_reason = #{scrapReason},</if>
+            <if test="rfidBindStatus != null">rfid_bind_status = #{rfidBindStatus},</if>
+            <if test="deviceCategoryId != null">device_category_id = #{deviceCategoryId},</if>
+            <if test="deviceCategory != null">device_category = #{deviceCategory},</if>
+            <if test="batteryLevel != null">battery_level = #{batteryLevel},</if>
+            <if test="frequency != null">frequency = #{frequency},</if>
+            <if test="batteryStatus != null">battery_status = #{batteryStatus},</if>
+            <if test="lastBatteryUpdate != null">last_battery_update = #{lastBatteryUpdate},</if>
+            <if test="productSn != null">product_sn = #{productSn},</if>
+            <if test="productModel != null">product_model = #{productModel},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="areaLocation != null">area_location = #{areaLocation},</if>
+            <if test="storageLocation != null">storage_location = #{storageLocation},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="deptName != null">dept_name = #{deptName},</if>
+            <if test="factoryId != null">factory_id = #{factoryId},</if>
+            <if test="factoryCode != null">factory_code = #{factoryCode},</if>
+            <if test="factoryName != null">factory_name = #{factoryName},</if>
+            <if test="areaId != null">area_id = #{areaId},</if>
+            <if test="areaName != null">area_name = #{areaName},</if>
+            <if test="remark1 != null">remark1 = #{remark1},</if>
+            <if test="remark2 != null">remark2 = #{remark2},</if>
+            <if test="remark3 != null">remark3 = #{remark3},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="taskId != null">task_id = #{taskId},</if>
+            <if test="taskCode != null">task_code = #{taskCode},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFLocationDeviceById" parameterType="Long">
+        delete from f_location_device where id = #{id}
+    </delete>
+
+    <delete id="deleteFLocationDeviceByIds" parameterType="String">
+        delete from f_location_device where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

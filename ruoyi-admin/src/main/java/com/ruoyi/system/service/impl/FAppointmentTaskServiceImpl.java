@@ -28,6 +28,8 @@ import com.ruoyi.system.domain.FForklift;
 import com.ruoyi.system.domain.FForkliftDriver;
 import com.ruoyi.system.mapper.FForkliftDriverMapper;
 import com.ruoyi.system.service.IFForkliftService;
+import com.ruoyi.system.mapper.FLocationDeviceMapper;
+import com.ruoyi.system.domain.FLocationDevice;
 
 /**
  * 预约任务Service业务层处理
@@ -64,6 +66,9 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
 
     @Autowired
     private IFForkliftService fForkliftService;
+
+    @Autowired
+    private FLocationDeviceMapper fLocationDeviceMapper;
 
     @Override
     public FAppointmentTask selectFAppointmentTaskById(Long id)
@@ -174,7 +179,7 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
 
     @Override
     @Transactional
-    public AjaxResult checkin(Long taskId)
+    public AjaxResult checkin(Long taskId, Long deviceId)
     {
         // 1. 查询主任务，校验状态
         FAppointmentTask task = fAppointmentTaskMapper.selectFAppointmentTaskById(taskId);
@@ -186,6 +191,27 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
         {
             return AjaxResult.error("只有待签到状态的任务才能签到");
         }
+
+        // 1.5 绑定定位设备
+        FLocationDevice device = fLocationDeviceMapper.selectFLocationDeviceById(deviceId);
+        if (device == null)
+        {
+            return AjaxResult.error("定位设备不存在");
+        }
+        if (!"idle".equals(device.getDeviceStatus()))
+        {
+            return AjaxResult.error("该定位设备当前不可用");
+        }
+        // 更新任务的设备绑定信息
+        task.setDeviceId(deviceId);
+        task.setDeviceSn(device.getDeviceSn());
+        task.setBindDeviceStatus("bound");
+        task.setBindTime(new Date());
+        // 更新设备状态为使用中
+        device.setDeviceStatus("using");
+        device.setTaskId(taskId);
+        device.setTaskCode(task.getTaskCode());
+        fLocationDeviceMapper.updateFLocationDevice(device);
 
         // 2. 查询该任务的码头明细列表，按dockSort排序，取第一个未赋值loadingTaskCode的
         FAppointmentTaskDock queryDock = new FAppointmentTaskDock();

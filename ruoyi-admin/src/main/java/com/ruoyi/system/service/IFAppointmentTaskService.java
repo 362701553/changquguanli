@@ -69,12 +69,13 @@ public interface IFAppointmentTaskService
     public AjaxResult insertFAppointmentTaskWithDocks(FAppointmentTask fAppointmentTask);
 
     /**
-     * 签到排队
+     * 绑定定位设备并签到排队
      *
      * @param taskId 任务ID
+     * @param deviceId 定位设备ID
      * @return 结果
      */
-    public AjaxResult checkin(Long taskId);
+    public AjaxResult checkin(Long taskId, Long deviceId);
 
     /**
      * 开始作业

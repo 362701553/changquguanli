@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FForkliftDriverBaseMapper">
+
+    <resultMap type="FForkliftDriverBase" id="FForkliftDriverBaseResult">
+        <result property="id"    column="id"    />
+        <result property="driverName"    column="driver_name"    />
+        <result property="driverPhone"    column="driver_phone"    />
+        <result property="driverStatus"    column="driver_status"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="account"    column="account"    />
+        <result property="password"    column="password"    />
+        <result property="userId"    column="user_id"    />
+        <result property="workStatus"    column="work_status"    />
+    </resultMap>
+
+    <sql id="selectFForkliftDriverBaseVo">
+        select id, driver_name, driver_phone, driver_status, deleted, account, password, user_id, work_status from f_forklift_driver_base
+    </sql>
+
+    <select id="selectFForkliftDriverBaseList" parameterType="FForkliftDriverBase" resultMap="FForkliftDriverBaseResult">
+        <include refid="selectFForkliftDriverBaseVo"/>
+        <where>
+            <if test="driverName != null  and driverName != ''"> and driver_name like concat('%', #{driverName}, '%')</if>
+            <if test="driverStatus != null  and driverStatus != ''"> and driver_status = #{driverStatus}</if>
+            and (deleted = 0 or deleted is null)
+        </where>
+    </select>
+
+    <select id="selectFForkliftDriverBaseById" parameterType="Long" resultMap="FForkliftDriverBaseResult">
+        <include refid="selectFForkliftDriverBaseVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertFForkliftDriverBase" parameterType="FForkliftDriverBase" useGeneratedKeys="true" keyProperty="id">
+        insert into f_forklift_driver_base
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="driverName != null">driver_name,</if>
+            <if test="driverPhone != null">driver_phone,</if>
+            <if test="driverStatus != null">driver_status,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="account != null">account,</if>
+            <if test="password != null">password,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="workStatus != null">work_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="driverName != null">#{driverName},</if>
+            <if test="driverPhone != null">#{driverPhone},</if>
+            <if test="driverStatus != null">#{driverStatus},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="account != null">#{account},</if>
+            <if test="password != null">#{password},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="workStatus != null">#{workStatus},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFForkliftDriverBase" parameterType="FForkliftDriverBase">
+        update f_forklift_driver_base
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="driverName != null">driver_name = #{driverName},</if>
+            <if test="driverPhone != null">driver_phone = #{driverPhone},</if>
+            <if test="driverStatus != null">driver_status = #{driverStatus},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="account != null">account = #{account},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="workStatus != null">work_status = #{workStatus},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFForkliftDriverBaseById" parameterType="Long">
+        delete from f_forklift_driver_base where id = #{id}
+    </delete>
+
+    <delete id="deleteFForkliftDriverBaseByIds" parameterType="String">
+        delete from f_forklift_driver_base where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectFForkliftDriverBaseByPhone" parameterType="String" resultMap="FForkliftDriverBaseResult">
+        <include refid="selectFForkliftDriverBaseVo"/>
+        where driver_phone = #{driverPhone} and (deleted = 0 or deleted is null) limit 1
+    </select>
+
+    <select id="selectAvailableDrivers" resultType="java.util.HashMap">
+        SELECT DISTINCT b.id, b.driver_name AS driverName, b.driver_phone AS driverPhone,
+               GROUP_CONCAT(fd.forklift_code) AS forkliftCodes
+        FROM f_forklift_driver_base b
+        INNER JOIN f_forklift_driver fd ON fd.driver_id = b.id AND fd.status = '0'
+        WHERE b.driver_status = '0'
+          AND (b.work_status = '0' OR b.work_status IS NULL)
+          AND (b.deleted = 0 OR b.deleted IS NULL)
+        GROUP BY b.id, b.driver_name, b.driver_phone
+    </select>
+</mapper>

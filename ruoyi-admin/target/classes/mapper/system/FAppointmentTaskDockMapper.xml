@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FAppointmentTaskDockMapper">
+    
+    <resultMap type="FAppointmentTaskDock" id="FAppointmentTaskDockResult">
+        <result property="id"    column="id"    />
+        <result property="taskId"    column="task_id"    />
+        <result property="lineNo"    column="line_no"    />
+        <result property="dockId"    column="dock_id"    />
+        <result property="dockName"    column="dock_name"    />
+        <result property="dockCode"    column="dock_code"    />
+        <result property="dockStart"    column="dock_start"    />
+        <result property="dockEnd"    column="dock_end"    />
+        <result property="loadingPointId"    column="loading_point_id"    />
+        <result property="loadingPointCode"    column="loading_point_code"    />
+        <result property="loadingPointName"    column="loading_point_name"    />
+        <result property="forkliftDriverId"    column="forklift_driver_id"    />
+        <result property="forkliftDriverName"    column="forklift_driver_name"    />
+        <result property="forkliftNo"    column="forklift_no"    />
+        <result property="forkliftExtra"    column="forklift_extra"    />
+        <result property="loadingQty"    column="loading_qty"    />
+        <result property="loadingStart"    column="loading_start"    />
+        <result property="loadingFinish"    column="loading_finish"    />
+        <result property="pointReleaseTime"    column="point_release_time"    />
+        <result property="arriveTime"    column="arrive_time"    />
+        <result property="leaveTime"    column="leave_time"    />
+        <result property="workStatus"    column="work_status"    />
+        <result property="factoryId"    column="factory_id"    />
+        <result property="factoryName"    column="factory_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateDate"    column="update_date"    />
+        <result property="planTimeDetailId"    column="plan_time_detail_id"    />
+        <result property="queueNumber"    column="queue_number"    />
+        <result property="expectWaitTime"    column="expect_wait_time"    />
+        <result property="queueStatus"    column="queue_status"    />
+        <result property="isWorkedJump"    column="is_worked_jump"    />
+        <result property="dockSort"    column="dock_sort"    />
+        <result property="parkingId"    column="parking_id"    />
+        <result property="carModel"    column="car_model"    />
+        <result property="parkingCode"    column="parking_code"    />
+        <result property="loadingTaskCode"    column="loading_task_code"    />
+        <result property="loadingType"    column="loading_type"    />
+        <result property="factoryAreaId"    column="factory_area_id"    />
+        <result property="factoryAreaName"    column="factory_area_name"    />
+        <result property="areaDeptId"    column="area_dept_id"    />
+    </resultMap>
+
+    <sql id="selectFAppointmentTaskDockVo">
+        select id, task_id, line_no, dock_id, dock_name, dock_code, dock_start, dock_end, loading_point_id, loading_point_code, loading_point_name, forklift_driver_id, forklift_driver_name, forklift_no, forklift_extra, loading_qty, loading_start, loading_finish, point_release_time, arrive_time, leave_time, work_status, factory_id, factory_name, dept_id, deleted, create_by, create_date, update_by, update_date, plan_time_detail_id, queue_number, expect_wait_time, queue_status, is_worked_jump, dock_sort, parking_id, car_model, parking_code, loading_task_code, loading_type, factory_area_id, factory_area_name, area_dept_id from f_appointment_task_dock
+    </sql>
+
+    <select id="selectFAppointmentTaskDockList" parameterType="FAppointmentTaskDock" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        <where>  
+            <if test="taskId != null "> and task_id = #{taskId}</if>
+            <if test="lineNo != null "> and line_no = #{lineNo}</if>
+            <if test="dockId != null "> and dock_id = #{dockId}</if>
+            <if test="dockName != null  and dockName != ''"> and dock_name like concat('%', #{dockName}, '%')</if>
+            <if test="dockCode != null  and dockCode != ''"> and dock_code = #{dockCode}</if>
+            <if test="dockStart != null "> and dock_start = #{dockStart}</if>
+            <if test="dockEnd != null "> and dock_end = #{dockEnd}</if>
+            <if test="loadingPointId != null "> and loading_point_id = #{loadingPointId}</if>
+            <if test="loadingPointCode != null  and loadingPointCode != ''"> and loading_point_code = #{loadingPointCode}</if>
+            <if test="loadingPointName != null  and loadingPointName != ''"> and loading_point_name like concat('%', #{loadingPointName}, '%')</if>
+            <if test="forkliftDriverId != null "> and forklift_driver_id = #{forkliftDriverId}</if>
+            <if test="forkliftDriverName != null  and forkliftDriverName != ''"> and forklift_driver_name like concat('%', #{forkliftDriverName}, '%')</if>
+            <if test="forkliftNo != null  and forkliftNo != ''"> and forklift_no = #{forkliftNo}</if>
+            <if test="forkliftExtra != null  and forkliftExtra != ''"> and forklift_extra = #{forkliftExtra}</if>
+            <if test="loadingQty != null "> and loading_qty = #{loadingQty}</if>
+            <if test="loadingStart != null "> and loading_start = #{loadingStart}</if>
+            <if test="loadingFinish != null "> and loading_finish = #{loadingFinish}</if>
+            <if test="pointReleaseTime != null "> and point_release_time = #{pointReleaseTime}</if>
+            <if test="arriveTime != null "> and arrive_time = #{arriveTime}</if>
+            <if test="leaveTime != null "> and leave_time = #{leaveTime}</if>
+            <if test="workStatus != null  and workStatus != ''"> and work_status = #{workStatus}</if>
+            <if test="factoryId != null "> and factory_id = #{factoryId}</if>
+            <if test="factoryName != null  and factoryName != ''"> and factory_name like concat('%', #{factoryName}, '%')</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="deleted != null "> and deleted = #{deleted}</if>
+            <if test="createDate != null "> and create_date = #{createDate}</if>
+            <if test="updateDate != null "> and update_date = #{updateDate}</if>
+            <if test="planTimeDetailId != null "> and plan_time_detail_id = #{planTimeDetailId}</if>
+            <if test="queueNumber != null "> and queue_number = #{queueNumber}</if>
+            <if test="expectWaitTime != null "> and expect_wait_time = #{expectWaitTime}</if>
+            <if test="queueStatus != null  and queueStatus != ''"> and queue_status = #{queueStatus}</if>
+            <if test="isWorkedJump != null  and isWorkedJump != ''"> and is_worked_jump = #{isWorkedJump}</if>
+            <if test="dockSort != null "> and dock_sort = #{dockSort}</if>
+            <if test="parkingId != null "> and parking_id = #{parkingId}</if>
+            <if test="carModel != null  and carModel != ''"> and car_model = #{carModel}</if>
+            <if test="parkingCode != null  and parkingCode != ''"> and parking_code = #{parkingCode}</if>
+            <if test="loadingTaskCode != null  and loadingTaskCode != ''"> and loading_task_code = #{loadingTaskCode}</if>
+            <if test="loadingType != null  and loadingType != ''"> and loading_type = #{loadingType}</if>
+            <if test="factoryAreaId != null "> and factory_area_id = #{factoryAreaId}</if>
+            <if test="factoryAreaName != null  and factoryAreaName != ''"> and factory_area_name like concat('%', #{factoryAreaName}, '%')</if>
+            <if test="areaDeptId != null "> and area_dept_id = #{areaDeptId}</if>
+        </where>
+    </select>
+    
+    <select id="selectFAppointmentTaskDockById" parameterType="Long" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertFAppointmentTaskDock" parameterType="FAppointmentTaskDock" useGeneratedKeys="true" keyProperty="id">
+        insert into f_appointment_task_dock
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskId != null">task_id,</if>
+            <if test="lineNo != null">line_no,</if>
+            <if test="dockId != null">dock_id,</if>
+            <if test="dockName != null">dock_name,</if>
+            <if test="dockCode != null">dock_code,</if>
+            <if test="dockStart != null">dock_start,</if>
+            <if test="dockEnd != null">dock_end,</if>
+            <if test="loadingPointId != null">loading_point_id,</if>
+            <if test="loadingPointCode != null">loading_point_code,</if>
+            <if test="loadingPointName != null">loading_point_name,</if>
+            <if test="forkliftDriverId != null">forklift_driver_id,</if>
+            <if test="forkliftDriverName != null">forklift_driver_name,</if>
+            <if test="forkliftNo != null">forklift_no,</if>
+            <if test="forkliftExtra != null">forklift_extra,</if>
+            <if test="loadingQty != null">loading_qty,</if>
+            <if test="loadingStart != null">loading_start,</if>
+            <if test="loadingFinish != null">loading_finish,</if>
+            <if test="pointReleaseTime != null">point_release_time,</if>
+            <if test="arriveTime != null">arrive_time,</if>
+            <if test="leaveTime != null">leave_time,</if>
+            <if test="workStatus != null">work_status,</if>
+            <if test="factoryId != null">factory_id,</if>
+            <if test="factoryName != null">factory_name,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateDate != null">update_date,</if>
+            <if test="planTimeDetailId != null">plan_time_detail_id,</if>
+            <if test="queueNumber != null">queue_number,</if>
+            <if test="expectWaitTime != null">expect_wait_time,</if>
+            <if test="queueStatus != null">queue_status,</if>
+            <if test="isWorkedJump != null">is_worked_jump,</if>
+            <if test="dockSort != null">dock_sort,</if>
+            <if test="parkingId != null">parking_id,</if>
+            <if test="carModel != null">car_model,</if>
+            <if test="parkingCode != null">parking_code,</if>
+            <if test="loadingTaskCode != null">loading_task_code,</if>
+            <if test="loadingType != null">loading_type,</if>
+            <if test="factoryAreaId != null">factory_area_id,</if>
+            <if test="factoryAreaName != null">factory_area_name,</if>
+            <if test="areaDeptId != null">area_dept_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskId != null">#{taskId},</if>
+            <if test="lineNo != null">#{lineNo},</if>
+            <if test="dockId != null">#{dockId},</if>
+            <if test="dockName != null">#{dockName},</if>
+            <if test="dockCode != null">#{dockCode},</if>
+            <if test="dockStart != null">#{dockStart},</if>
+            <if test="dockEnd != null">#{dockEnd},</if>
+            <if test="loadingPointId != null">#{loadingPointId},</if>
+            <if test="loadingPointCode != null">#{loadingPointCode},</if>
+            <if test="loadingPointName != null">#{loadingPointName},</if>
+            <if test="forkliftDriverId != null">#{forkliftDriverId},</if>
+            <if test="forkliftDriverName != null">#{forkliftDriverName},</if>
+            <if test="forkliftNo != null">#{forkliftNo},</if>
+            <if test="forkliftExtra != null">#{forkliftExtra},</if>
+            <if test="loadingQty != null">#{loadingQty},</if>
+            <if test="loadingStart != null">#{loadingStart},</if>
+            <if test="loadingFinish != null">#{loadingFinish},</if>
+            <if test="pointReleaseTime != null">#{pointReleaseTime},</if>
+            <if test="arriveTime != null">#{arriveTime},</if>
+            <if test="leaveTime != null">#{leaveTime},</if>
+            <if test="workStatus != null">#{workStatus},</if>
+            <if test="factoryId != null">#{factoryId},</if>
+            <if test="factoryName != null">#{factoryName},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateDate != null">#{updateDate},</if>
+            <if test="planTimeDetailId != null">#{planTimeDetailId},</if>
+            <if test="queueNumber != null">#{queueNumber},</if>
+            <if test="expectWaitTime != null">#{expectWaitTime},</if>
+            <if test="queueStatus != null">#{queueStatus},</if>
+            <if test="isWorkedJump != null">#{isWorkedJump},</if>
+            <if test="dockSort != null">#{dockSort},</if>
+            <if test="parkingId != null">#{parkingId},</if>
+            <if test="carModel != null">#{carModel},</if>
+            <if test="parkingCode != null">#{parkingCode},</if>
+            <if test="loadingTaskCode != null">#{loadingTaskCode},</if>
+            <if test="loadingType != null">#{loadingType},</if>
+            <if test="factoryAreaId != null">#{factoryAreaId},</if>
+            <if test="factoryAreaName != null">#{factoryAreaName},</if>
+            <if test="areaDeptId != null">#{areaDeptId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFAppointmentTaskDock" parameterType="FAppointmentTaskDock">
+        update f_appointment_task_dock
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskId != null">task_id = #{taskId},</if>
+            <if test="lineNo != null">line_no = #{lineNo},</if>
+            <if test="dockId != null">dock_id = #{dockId},</if>
+            <if test="dockName != null">dock_name = #{dockName},</if>
+            <if test="dockCode != null">dock_code = #{dockCode},</if>
+            <if test="dockStart != null">dock_start = #{dockStart},</if>
+            <if test="dockEnd != null">dock_end = #{dockEnd},</if>
+            <if test="loadingPointId != null">loading_point_id = #{loadingPointId},</if>
+            <if test="loadingPointCode != null">loading_point_code = #{loadingPointCode},</if>
+            <if test="loadingPointName != null">loading_point_name = #{loadingPointName},</if>
+            <if test="forkliftDriverId != null">forklift_driver_id = #{forkliftDriverId},</if>
+            <if test="forkliftDriverName != null">forklift_driver_name = #{forkliftDriverName},</if>
+            <if test="forkliftNo != null">forklift_no = #{forkliftNo},</if>
+            <if test="forkliftExtra != null">forklift_extra = #{forkliftExtra},</if>
+            <if test="loadingQty != null">loading_qty = #{loadingQty},</if>
+            <if test="loadingStart != null">loading_start = #{loadingStart},</if>
+            <if test="loadingFinish != null">loading_finish = #{loadingFinish},</if>
+            <if test="pointReleaseTime != null">point_release_time = #{pointReleaseTime},</if>
+            <if test="arriveTime != null">arrive_time = #{arriveTime},</if>
+            <if test="leaveTime != null">leave_time = #{leaveTime},</if>
+            <if test="workStatus != null">work_status = #{workStatus},</if>
+            <if test="factoryId != null">factory_id = #{factoryId},</if>
+            <if test="factoryName != null">factory_name = #{factoryName},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateDate != null">update_date = #{updateDate},</if>
+            <if test="planTimeDetailId != null">plan_time_detail_id = #{planTimeDetailId},</if>
+            <if test="queueNumber != null">queue_number = #{queueNumber},</if>
+            <if test="expectWaitTime != null">expect_wait_time = #{expectWaitTime},</if>
+            <if test="queueStatus != null">queue_status = #{queueStatus},</if>
+            <if test="isWorkedJump != null">is_worked_jump = #{isWorkedJump},</if>
+            <if test="dockSort != null">dock_sort = #{dockSort},</if>
+            <if test="parkingId != null">parking_id = #{parkingId},</if>
+            <if test="carModel != null">car_model = #{carModel},</if>
+            <if test="parkingCode != null">parking_code = #{parkingCode},</if>
+            <if test="loadingTaskCode != null">loading_task_code = #{loadingTaskCode},</if>
+            <if test="loadingType != null">loading_type = #{loadingType},</if>
+            <if test="factoryAreaId != null">factory_area_id = #{factoryAreaId},</if>
+            <if test="factoryAreaName != null">factory_area_name = #{factoryAreaName},</if>
+            <if test="areaDeptId != null">area_dept_id = #{areaDeptId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFAppointmentTaskDockById" parameterType="Long">
+        delete from f_appointment_task_dock where id = #{id}
+    </delete>
+
+    <delete id="deleteFAppointmentTaskDockByIds" parameterType="String">
+        delete from f_appointment_task_dock where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectMaxLoadingTaskCodeByDate" parameterType="String" resultType="String">
+        select max(loading_task_code) from f_appointment_task_dock
+        where loading_task_code like concat(#{datePrefix}, '%')
+    </select>
+
+    <select id="selectMaxQueueNumberByDockId" parameterType="Long" resultType="Long">
+        select max(queue_number) from f_appointment_task_dock
+        where dock_id = #{dockId} and queue_number is not null
+    </select>
+
+    <select id="selectNextQueuedDockTask" parameterType="Long" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        where dock_id = #{dockId}
+          and queue_status = '停车位排队'
+          and work_status = '0'
+        order by queue_number asc
+        limit 1
+    </select>
+
+    <select id="selectNextOutsideQueuedDockTask" parameterType="Long" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        where dock_id = #{dockId}
+          and queue_status = '厂外排队'
+          and work_status = '0'
+        order by queue_number asc
+        limit 1
+    </select>
+
+    <select id="selectParkingQueuedList" parameterType="Long" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        where dock_id = #{dockId}
+          and queue_status = '停车位排队'
+          and work_status = '0'
+        order by queue_number asc
+    </select>
+
+    <select id="selectOutsideQueuedList" parameterType="Long" resultMap="FAppointmentTaskDockResult">
+        <include refid="selectFAppointmentTaskDockVo"/>
+        where dock_id = #{dockId}
+          and queue_status = '厂外排队'
+          and work_status = '0'
+        order by queue_number asc
+    </select>
+</mapper>

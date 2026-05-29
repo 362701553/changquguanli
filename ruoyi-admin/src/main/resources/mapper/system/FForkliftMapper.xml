@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FForkliftMapper">
+
+    <resultMap type="FForklift" id="FForkliftResult">
+        <result property="id"    column="id"    />
+        <result property="forkliftCode"    column="forklift_code"    />
+        <result property="forkliftName"    column="forklift_name"    />
+        <result property="forkliftType"    column="forklift_type"    />
+        <result property="workStatus"    column="work_status"    />
+        <result property="deleted"    column="deleted"    />
+    </resultMap>
+
+    <sql id="selectFForkliftVo">
+        select id, forklift_code, forklift_name, forklift_type, work_status, deleted from f_forklift
+    </sql>
+
+    <select id="selectFForkliftList" parameterType="FForklift" resultMap="FForkliftResult">
+        <include refid="selectFForkliftVo"/>
+        <where>
+            <if test="forkliftCode != null  and forkliftCode != ''"> and forklift_code like concat('%', #{forkliftCode}, '%')</if>
+            <if test="forkliftName != null  and forkliftName != ''"> and forklift_name like concat('%', #{forkliftName}, '%')</if>
+            <if test="forkliftType != null  and forkliftType != ''"> and forklift_type = #{forkliftType}</if>
+            <if test="workStatus != null  and workStatus != ''"> and work_status = #{workStatus}</if>
+            and (deleted = 0 or deleted is null)
+        </where>
+    </select>
+
+    <select id="selectFForkliftById" parameterType="Long" resultMap="FForkliftResult">
+        <include refid="selectFForkliftVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertFForklift" parameterType="FForklift" useGeneratedKeys="true" keyProperty="id">
+        insert into f_forklift
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="forkliftCode != null">forklift_code,</if>
+            <if test="forkliftName != null">forklift_name,</if>
+            <if test="forkliftType != null">forklift_type,</if>
+            <if test="workStatus != null">work_status,</if>
+            <if test="deleted != null">deleted,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="forkliftCode != null">#{forkliftCode},</if>
+            <if test="forkliftName != null">#{forkliftName},</if>
+            <if test="forkliftType != null">#{forkliftType},</if>
+            <if test="workStatus != null">#{workStatus},</if>
+            <if test="deleted != null">#{deleted},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFForklift" parameterType="FForklift">
+        update f_forklift
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="forkliftCode != null">forklift_code = #{forkliftCode},</if>
+            <if test="forkliftName != null">forklift_name = #{forkliftName},</if>
+            <if test="forkliftType != null">forklift_type = #{forkliftType},</if>
+            <if test="workStatus != null">work_status = #{workStatus},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFForkliftById" parameterType="Long">
+        delete from f_forklift where id = #{id}
+    </delete>
+
+    <delete id="deleteFForkliftByIds" parameterType="String">
+        delete from f_forklift where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

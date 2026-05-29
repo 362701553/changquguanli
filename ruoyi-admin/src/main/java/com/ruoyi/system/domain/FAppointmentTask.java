@@ -279,6 +279,9 @@ public class FAppointmentTask extends BaseEntity
     @Excel(name = "审核备注")
     private String reviewNotes;
 
+    /** 预约码头名称拼接（非持久化） */
+    private String dockNames;
+
     /** 选中的码头ID列表（非持久化，仅用于新增传参） */
     private List<Long> dockIds;
 
@@ -291,6 +294,14 @@ public class FAppointmentTask extends BaseEntity
 
     public void setDockIds(List<Long> dockIds) {
         this.dockIds = dockIds;
+    }
+
+    public String getDockNames() {
+        return dockNames;
+    }
+
+    public void setDockNames(String dockNames) {
+        this.dockNames = dockNames;
     }
 
     public List<FAppointmentTaskCompanion> getCompanions() {

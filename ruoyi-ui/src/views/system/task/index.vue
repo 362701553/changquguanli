@@ -101,9 +101,9 @@
           <el-tag :type="statusTagType(scope.row.taskStatus)">{{ statusText(scope.row.taskStatus) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="当前排队码头" align="center" prop="currentDockName" min-width="120">
+      <el-table-column label="预约码头" align="center" prop="dockNames" min-width="120">
         <template slot-scope="scope">
-          <span>{{ scope.row.currentDockName || '-' }}</span>
+          <span>{{ scope.row.dockNames || '-' }}</span>
         </template>
       </el-table-column>
       <el-table-column label="创建时间" align="center" prop="createDate" min-width="160">
@@ -255,9 +255,9 @@
         <el-descriptions-item label="创建时间">{{ parseTime(viewForm.createDate, '{y}-{m}-{d} {h}:{i}:{s}') }}</el-descriptions-item>
       </el-descriptions>
 
-      <!-- 签到按钮区域 -->
+      <!-- 绑定定位设备按钮区域 -->
       <el-row style="margin-top: 16px; margin-bottom: 16px;" v-if="viewForm.taskStatus === '0'">
-        <el-button type="success" icon="el-icon-check" @click="handleCheckin" :loading="checkinLoading">签 到</el-button>
+        <el-button type="success" icon="el-icon-location" @click="handleBindDevice">绑定定位设备</el-button>
       </el-row>
 
       <!-- 签出按钮区域 -->
@@ -380,6 +380,29 @@
         <el-button @click="assignDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 绑定定位设备对话框 -->
+    <el-dialog title="绑定定位设备" :visible.sync="bindDeviceDialogVisible" width="500px" append-to-body>
+      <el-form :inline="true" size="small" style="margin-bottom: 10px;">
+        <el-form-item label="设备序列号">
+          <el-input v-model="deviceQuerySn" placeholder="请输入设备序列号" clearable style="width: 180px;" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" icon="el-icon-search" @click="searchDevices">查询</el-button>
+        </el-form-item>
+      </el-form>
+      <el-form label-width="100px">
+        <el-form-item label="定位设备">
+          <el-select v-model="selectedDeviceId" placeholder="请选择定位设备" filterable style="width: 100%;" :loading="bindDeviceLoading">
+            <el-option v-for="item in availableDeviceList" :key="item.id" :label="item.deviceSn + (item.productName ? ' - ' + item.productName : '')" :value="item.id" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="bindDeviceDialogVisible = false">取 消</el-button>
+        <el-button type="primary" :loading="checkinLoading" :disabled="!selectedDeviceId" @click="confirmBindDevice">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -387,6 +410,7 @@
 import { listTask, getTask, delTask, addTask, checkinTask, addTaskDock, releasePoint, checkoutTask, getAvailableDrivers, assignDriver } from "@/api/system/task";
 import { listDock } from "@/api/system/dock";
 import { listVehicle } from "@/api/system/vehicle";
+import { getAvailableDevices } from "@/api/system/location";
 
 export default {
   name: "Task",
@@ -409,6 +433,11 @@ export default {
       dockList: [],
       checkinLoading: false,
       checkoutLoading: false,
+      bindDeviceDialogVisible: false,
+      bindDeviceLoading: false,
+      availableDeviceList: [],
+      selectedDeviceId: null,
+      deviceQuerySn: '',
       activeTab: "all",
       loadingTaskOpen: false,
       assignDialogVisible: false,
@@ -571,18 +600,46 @@ export default {
         this.viewOpen = true;
       });
     },
-    handleCheckin() {
-      this.$modal.confirm('确认对该任务进行签到操作？').then(() => {
-        this.checkinLoading = true;
-        checkinTask(this.viewForm.id).then(response => {
-          this.$modal.msgSuccess(response.msg || "签到成功");
-          this.checkinLoading = false;
-          this.handleView(this.viewForm);
-          this.getList();
-        }).catch(() => {
-          this.checkinLoading = false;
-        });
-      }).catch(() => {});
+    handleBindDevice() {
+      this.selectedDeviceId = null;
+      this.deviceQuerySn = '';
+      this.bindDeviceDialogVisible = true;
+      this.bindDeviceLoading = true;
+      getAvailableDevices().then(response => {
+        this.availableDeviceList = response.data || [];
+        this.bindDeviceLoading = false;
+      }).catch(() => {
+        this.bindDeviceLoading = false;
+      });
+    },
+    searchDevices() {
+      this.bindDeviceLoading = true;
+      this.selectedDeviceId = null;
+      const query = {};
+      if (this.deviceQuerySn) {
+        query.deviceSn = this.deviceQuerySn;
+      }
+      getAvailableDevices(query).then(response => {
+        this.availableDeviceList = response.data || [];
+        this.bindDeviceLoading = false;
+      }).catch(() => {
+        this.bindDeviceLoading = false;
+      });
+    },
+    confirmBindDevice() {
+      if (!this.selectedDeviceId) {
+        return;
+      }
+      this.checkinLoading = true;
+      checkinTask(this.viewForm.id, this.selectedDeviceId).then(response => {
+        this.$modal.msgSuccess(response.msg || "绑定设备并签到成功");
+        this.checkinLoading = false;
+        this.bindDeviceDialogVisible = false;
+        this.handleView(this.viewForm);
+        this.getList();
+      }).catch(() => {
+        this.checkinLoading = false;
+      });
     },
     handleCheckout() {
       this.$modal.confirm('确认对该任务进行签出操作？签出后任务将结束。').then(() => {
