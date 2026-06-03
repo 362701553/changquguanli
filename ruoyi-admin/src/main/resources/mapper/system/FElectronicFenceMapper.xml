@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FElectronicFenceMapper">
+
+    <resultMap type="FElectronicFence" id="FElectronicFenceResult">
+        <result property="id"    column="id"    />
+        <result property="fenceName"    column="fence_name"    />
+        <result property="fenceType"    column="fence_type"    />
+        <result property="dockId"    column="dock_id"    />
+        <result property="dockName"    column="dock_name"    />
+        <result property="status"    column="status"    />
+        <result property="factoryId"    column="factory_id"    />
+        <result property="factoryName"    column="factory_name"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateDate"    column="update_date"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectFElectronicFenceVo">
+        select id, fence_name, fence_type, dock_id, dock_name, status, factory_id, factory_name, dept_id, create_by, create_date, update_by, update_date, deleted, remark from f_electronic_fence
+    </sql>
+
+    <select id="selectFElectronicFenceList" parameterType="FElectronicFence" resultMap="FElectronicFenceResult">
+        <include refid="selectFElectronicFenceVo"/>
+        <where>
+            deleted = 0
+            <if test="fenceName != null and fenceName != ''"> and fence_name like concat('%', #{fenceName}, '%')</if>
+            <if test="fenceType != null and fenceType != ''"> and fence_type = #{fenceType}</if>
+            <if test="dockId != null"> and dock_id = #{dockId}</if>
+            <if test="status != null"> and status = #{status}</if>
+            <if test="factoryId != null"> and factory_id = #{factoryId}</if>
+            <if test="deptId != null"> and dept_id = #{deptId}</if>
+        </where>
+        order by create_date desc
+    </select>
+
+    <select id="selectFElectronicFenceById" parameterType="Long" resultMap="FElectronicFenceResult">
+        <include refid="selectFElectronicFenceVo"/>
+        where id = #{id} and deleted = 0
+    </select>
+
+    <select id="selectWorkingFenceByDockId" resultMap="FElectronicFenceResult">
+        <include refid="selectFElectronicFenceVo"/>
+        where dock_id = #{dockId} and fence_type = 'working' and deleted = 0
+        <if test="excludeId != null"> and id != #{excludeId}</if>
+        limit 1
+    </select>
+
+    <insert id="insertFElectronicFence" parameterType="FElectronicFence" useGeneratedKeys="true" keyProperty="id">
+        insert into f_electronic_fence
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fenceName != null">fence_name,</if>
+            <if test="fenceType != null">fence_type,</if>
+            <if test="dockId != null">dock_id,</if>
+            <if test="dockName != null">dock_name,</if>
+            <if test="status != null">status,</if>
+            <if test="factoryId != null">factory_id,</if>
+            <if test="factoryName != null">factory_name,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateDate != null">update_date,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fenceName != null">#{fenceName},</if>
+            <if test="fenceType != null">#{fenceType},</if>
+            <if test="dockId != null">#{dockId},</if>
+            <if test="dockName != null">#{dockName},</if>
+            <if test="status != null">#{status},</if>
+            <if test="factoryId != null">#{factoryId},</if>
+            <if test="factoryName != null">#{factoryName},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateDate != null">#{updateDate},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateFElectronicFence" parameterType="FElectronicFence">
+        update f_electronic_fence
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fenceName != null">fence_name = #{fenceName},</if>
+            <if test="fenceType != null">fence_type = #{fenceType},</if>
+            <if test="dockId != null">dock_id = #{dockId},</if>
+            <if test="dockName != null">dock_name = #{dockName},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="factoryId != null">factory_id = #{factoryId},</if>
+            <if test="factoryName != null">factory_name = #{factoryName},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateDate != null">update_date = #{updateDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteFElectronicFenceById" parameterType="Long">
+        update f_electronic_fence set deleted = 1 where id = #{id}
+    </update>
+
+    <update id="deleteFElectronicFenceByIds" parameterType="String">
+        update f_electronic_fence set deleted = 1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

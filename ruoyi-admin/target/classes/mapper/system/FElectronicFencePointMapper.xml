@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FElectronicFencePointMapper">
+
+    <resultMap type="FElectronicFencePoint" id="FElectronicFencePointResult">
+        <result property="id"    column="id"    />
+        <result property="fenceId"    column="fence_id"    />
+        <result property="lng"    column="lng"    />
+        <result property="lat"    column="lat"    />
+        <result property="sortOrder"    column="sort_order"    />
+    </resultMap>
+
+    <select id="selectPointsByFenceId" parameterType="Long" resultMap="FElectronicFencePointResult">
+        select id, fence_id, lng, lat, sort_order from f_electronic_fence_point
+        where fence_id = #{fenceId}
+        order by sort_order asc
+    </select>
+
+    <insert id="batchInsertPoints" parameterType="java.util.List">
+        insert into f_electronic_fence_point (fence_id, lng, lat, sort_order) values
+        <foreach item="item" collection="list" separator=",">
+            (#{item.fenceId}, #{item.lng}, #{item.lat}, #{item.sortOrder})
+        </foreach>
+    </insert>
+
+    <delete id="deletePointsByFenceId" parameterType="Long">
+        delete from f_electronic_fence_point where fence_id = #{fenceId}
+    </delete>
+</mapper>
