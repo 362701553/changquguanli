@@ -88,6 +88,18 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/securityScreen',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/system/securityScreen/index'),
+        name: 'SecurityScreen',
+        meta: { title: '安保大屏', icon: 'monitor' }
+      }
+    ]
+  },
 
 
 
