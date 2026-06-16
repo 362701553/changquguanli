@@ -1,0 +1,20 @@
+# 国内网络：构建阶段用阿里云公共 Maven 镜像（已验证可拉取）
+FROM registry.cn-hangzhou.aliyuncs.com/acs/maven:3-jdk-8 AS builder
+WORKDIR /app
+COPY pom.xml .
+COPY ruoyi-admin/pom.xml ruoyi-admin/
+COPY ruoyi-common/pom.xml ruoyi-common/
+COPY ruoyi-framework/pom.xml ruoyi-framework/
+COPY ruoyi-generator/pom.xml ruoyi-generator/
+COPY ruoyi-quartz/pom.xml ruoyi-quartz/
+COPY ruoyi-system/pom.xml ruoyi-system/
+RUN mvn dependency:go-offline -B -pl ruoyi-admin -am || true
+COPY . .
+RUN mvn clean package -DskipTests -pl ruoyi-admin -am
+
+# 运行阶段复用同一镜像（含 JDK8，体积较大但无需 Docker Hub）
+FROM registry.cn-hangzhou.aliyuncs.com/acs/maven:3-jdk-8
+WORKDIR /app
+COPY --from=builder /app/ruoyi-admin/target/ruoyi-admin.jar app.jar
+EXPOSE 8081
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]

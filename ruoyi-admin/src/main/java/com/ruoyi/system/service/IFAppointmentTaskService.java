@@ -109,4 +109,41 @@ public interface IFAppointmentTaskService
      * @return 结果
      */
     public AjaxResult assignForkliftDriver(Long dockTaskId, Long driverId);
+
+    /**
+     * 获取全局排队队列（按优先级排序）
+     */
+    public List<FAppointmentTask> getGlobalQueueList();
+
+    /**
+     * 叫号
+     *
+     * @param taskId 任务ID
+     * @param dockId 分配的码头ID
+     * @param dispatcherId 发货员ID
+     * @param dispatcherName 发货员名称
+     * @return 结果
+     */
+    public AjaxResult callNumber(Long taskId, Long dockId, Long dispatcherId, String dispatcherName);
+
+    /**
+     * 司机确认入厂
+     *
+     * @param taskId 任务ID
+     * @return 结果
+     */
+    public AjaxResult confirmEntry(Long taskId);
+
+    /**
+     * 过号处理
+     *
+     * @param taskId 任务ID
+     * @return 结果
+     */
+    public AjaxResult missNumber(Long taskId);
+
+    /**
+     * 批量处理超时叫号
+     */
+    public AjaxResult processTimedOutCalls();
 }

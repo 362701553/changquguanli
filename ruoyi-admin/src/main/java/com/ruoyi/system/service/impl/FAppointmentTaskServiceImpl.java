@@ -192,7 +192,7 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
             return AjaxResult.error("只有待签到状态的任务才能签到");
         }
 
-        // 1.5 绑定定位设备
+        // 2. 绑定定位设备
         FLocationDevice device = fLocationDeviceMapper.selectFLocationDeviceById(deviceId);
         if (device == null)
         {
@@ -202,127 +202,33 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
         {
             return AjaxResult.error("该定位设备当前不可用");
         }
-        // 更新任务的设备绑定信息
         task.setDeviceId(deviceId);
         task.setDeviceSn(device.getDeviceSn());
         task.setBindDeviceStatus("bound");
         task.setBindTime(new Date());
-        // 更新设备状态为使用中
         device.setDeviceStatus("using");
         device.setTaskId(taskId);
         device.setTaskCode(task.getTaskCode());
         fLocationDeviceMapper.updateFLocationDevice(device);
 
-        // 2. 查询该任务的码头明细列表，按dockSort排序，取第一个未赋值loadingTaskCode的
-        FAppointmentTaskDock queryDock = new FAppointmentTaskDock();
-        queryDock.setTaskId(taskId);
-        List<FAppointmentTaskDock> dockList = fAppointmentTaskDockMapper.selectFAppointmentTaskDockList(queryDock);
-        List<FAppointmentTaskDock> sortedList = dockList.stream()
-                .sorted((a, b) -> {
-                    Long sortA = a.getDockSort() != null ? a.getDockSort() : 0L;
-                    Long sortB = b.getDockSort() != null ? b.getDockSort() : 0L;
-                    return sortA.compareTo(sortB);
-                })
-                .filter(d -> d.getLoadingTaskCode() == null || d.getLoadingTaskCode().isEmpty())
-                .collect(Collectors.toList());
+        // 3. 记录实际签到时间
+        Date now = new Date();
+        task.setActualCheckinTime(now);
 
-        if (sortedList.isEmpty())
-        {
-            return AjaxResult.error("没有可用的码头明细进行签到");
-        }
+        // 4. 判断签到类型
+        String checkinType = determineCheckinType(now, task.getAppointmentStart(), task.getAppointmentEnd());
+        task.setCheckinType(checkinType);
 
-        FAppointmentTaskDock targetDock = sortedList.get(0);
+        // 5. 进入全局排队队列
+        task.setTaskStatus("7");
+        task.setQueueEnterTime(calculateQueueEnterTime(checkinType, now, task.getAppointmentStart()));
+        task.setCallCount(0);
+        task.setMissCount(0);
 
-        // 3. 生成装卸任务编码: LT + yyyyMMdd + 4位序号
-        String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        String ltPrefix = "LT" + today;
-        String maxCode = fAppointmentTaskDockMapper.selectMaxLoadingTaskCodeByDate(ltPrefix);
-        int seq = 1;
-        if (maxCode != null && maxCode.length() > ltPrefix.length())
-        {
-            seq = Integer.parseInt(maxCode.substring(ltPrefix.length())) + 1;
-        }
-        String loadingTaskCode = ltPrefix + String.format("%04d", seq);
-        targetDock.setLoadingTaskCode(loadingTaskCode);
-        targetDock.setWorkStatus("0");
-
-        // 4. 获取该码头的dockId，查询码头资源
-        Long dockId = targetDock.getDockId();
-        FDock dock = fDockService.selectFDockById(dockId);
-
-        // 4a. 查询空闲装卸点
-        FDockLoadingPoint queryPoint = new FDockLoadingPoint();
-        queryPoint.setDockId(dockId);
-        queryPoint.setStatus(1);
-        queryPoint.setIsOccupy("0");
-        queryPoint.setDeleted(0);
-        List<FDockLoadingPoint> freePoints = fDockLoadingPointService.selectFDockLoadingPointList(queryPoint);
-
-        if (freePoints != null && !freePoints.isEmpty())
-        {
-            // 有空闲装卸点
-            FDockLoadingPoint point = freePoints.get(0);
-            point.setIsOccupy("1");
-            fDockLoadingPointService.updateFDockLoadingPoint(point);
-
-            targetDock.setLoadingPointId(point.getId());
-            targetDock.setLoadingPointCode(point.getLoadingPointCode());
-            targetDock.setLoadingPointName(point.getLoadingPointName());
-            targetDock.setQueueStatus("装卸点排队");
-
-            task.setTaskStatus("1");
-        }
-        else
-        {
-            // 4b. 查询空闲停车位
-            FDockParkingSpace querySpace = new FDockParkingSpace();
-            querySpace.setDockId(dockId);
-            querySpace.setStatus(1);
-            querySpace.setIsOccupy("0");
-            querySpace.setDeleted(0);
-            List<FDockParkingSpace> freeSpaces = fDockParkingSpaceService.selectFDockParkingSpaceList(querySpace);
-
-            if (freeSpaces != null && !freeSpaces.isEmpty())
-            {
-                // 有空闲停车位
-                FDockParkingSpace space = freeSpaces.get(0);
-                space.setIsOccupy("1");
-                fDockParkingSpaceService.updateFDockParkingSpace(space);
-
-                targetDock.setParkingId(space.getId());
-                targetDock.setParkingCode(space.getParkingSpaceCode());
-                targetDock.setQueueStatus("停车位排队");
-
-                // 计算排队序号
-                Long maxQueue = fAppointmentTaskDockMapper.selectMaxQueueNumberByDockId(dockId);
-                targetDock.setQueueNumber(maxQueue == null ? 1L : maxQueue + 1L);
-
-                task.setTaskStatus("1");
-            }
-            else
-            {
-                // 4c. 装卸点和停车位都无空闲
-                targetDock.setQueueStatus("厂外排队");
-
-                Long maxQueue = fAppointmentTaskDockMapper.selectMaxQueueNumberByDockId(dockId);
-                targetDock.setQueueNumber(maxQueue == null ? 1L : maxQueue + 1L);
-
-                task.setTaskStatus("4");
-            }
-        }
-
-        // 5. 主任务赋值当前排队码头
-        task.setCurrentDockId(dockId);
-        if (dock != null)
-        {
-            task.setCurrentDockName(dock.getDockName());
-        }
-
-        // 6. 更新记录
-        fAppointmentTaskDockMapper.updateFAppointmentTaskDock(targetDock);
+        // 6. 更新任务
         fAppointmentTaskMapper.updateFAppointmentTask(task);
 
-        return AjaxResult.success("签到成功");
+        return AjaxResult.success("签到成功，已进入排队队列");
     }
 
     @Override
@@ -775,5 +681,335 @@ public class FAppointmentTaskServiceImpl implements IFAppointmentTaskService
         }
 
         return AjaxResult.success("指派成功");
+    }
+
+    @Override
+    public List<FAppointmentTask> getGlobalQueueList()
+    {
+        List<FAppointmentTask> queueList = fAppointmentTaskMapper.selectGlobalQueueList();
+        Date now = new Date();
+        boolean needReSort = false;
+
+        // 检查提前签到的任务，如果预约时间已开始，升级为normal优先级
+        for (FAppointmentTask task : queueList)
+        {
+            if ("early".equals(task.getCheckinType()) && now.compareTo(task.getAppointmentStart()) >= 0)
+            {
+                task.setCheckinType("normal");
+                task.setQueueEnterTime(task.getActualCheckinTime());
+                fAppointmentTaskMapper.updateFAppointmentTask(task);
+                needReSort = true;
+            }
+        }
+
+        if (needReSort)
+        {
+            queueList = fAppointmentTaskMapper.selectGlobalQueueList();
+        }
+        return queueList;
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult callNumber(Long taskId, Long dockId, Long dispatcherId, String dispatcherName)
+    {
+        // 1. 校验任务状态必须为排队中
+        FAppointmentTask task = fAppointmentTaskMapper.selectFAppointmentTaskById(taskId);
+        if (task == null)
+        {
+            return AjaxResult.error("任务不存在");
+        }
+        if (!"7".equals(task.getTaskStatus()))
+        {
+            return AjaxResult.error("只有排队中的任务才能叫号");
+        }
+
+        // 2. 码头和发货员二选一
+        if (dockId != null)
+        {
+            FDock dock = fDockService.selectFDockById(dockId);
+            if (dock == null)
+            {
+                return AjaxResult.error("码头不存在");
+            }
+            task.setAssignedDockId(dockId);
+            task.setAssignedDockName(dock.getDockName());
+        }
+        if (dispatcherName != null && !dispatcherName.isEmpty())
+        {
+            task.setDispatcherId(dispatcherId);
+            task.setDispatcherName(dispatcherName);
+        }
+
+        // 3. 更新任务状态为叫号中
+        task.setTaskStatus("8");
+        task.setCallTime(new Date());
+        task.setCallCount((task.getCallCount() == null ? 0 : task.getCallCount()) + 1);
+        fAppointmentTaskMapper.updateFAppointmentTask(task);
+
+        return AjaxResult.success("叫号成功");
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult confirmEntry(Long taskId)
+    {
+        FAppointmentTask task = fAppointmentTaskMapper.selectFAppointmentTaskById(taskId);
+        if (task == null)
+        {
+            return AjaxResult.error("任务不存在");
+        }
+        if (!"8".equals(task.getTaskStatus()))
+        {
+            return AjaxResult.error("只有叫号中状态才能确认入厂");
+        }
+
+        // 检查是否超时
+        Date now = new Date();
+        long diffMinutes = (now.getTime() - task.getCallTime().getTime()) / (1000 * 60);
+        if (diffMinutes >= 5)
+        {
+            return AjaxResult.error("已超时，请等待重新排队");
+        }
+
+        // 分配码头资源
+        Long dockId = task.getAssignedDockId();
+
+        // 如果叫号时没有选码头（选了发货员），从任务的码头明细中取第一个
+        if (dockId == null)
+        {
+            FAppointmentTaskDock queryFirstDock = new FAppointmentTaskDock();
+            queryFirstDock.setTaskId(taskId);
+            List<FAppointmentTaskDock> firstDockList = fAppointmentTaskDockMapper.selectFAppointmentTaskDockList(queryFirstDock);
+            FAppointmentTaskDock firstUnprocessed = firstDockList.stream()
+                    .sorted((a, b) -> {
+                        Long sortA = a.getDockSort() != null ? a.getDockSort() : 0L;
+                        Long sortB = b.getDockSort() != null ? b.getDockSort() : 0L;
+                        return sortA.compareTo(sortB);
+                    })
+                    .filter(d -> d.getLoadingTaskCode() == null || d.getLoadingTaskCode().isEmpty())
+                    .findFirst()
+                    .orElse(null);
+            if (firstUnprocessed != null)
+            {
+                dockId = firstUnprocessed.getDockId();
+            }
+            else
+            {
+                return AjaxResult.error("没有可用的码头明细");
+            }
+        }
+
+        FDock dockInfo = fDockService.selectFDockById(dockId);
+        task.setCurrentDockId(dockId);
+        if (dockInfo != null)
+        {
+            task.setCurrentDockName(dockInfo.getDockName());
+        }
+
+        // 查找任务的码头明细
+        final Long finalDockId = dockId;
+        FAppointmentTaskDock queryDock = new FAppointmentTaskDock();
+        queryDock.setTaskId(taskId);
+        List<FAppointmentTaskDock> dockList = fAppointmentTaskDockMapper.selectFAppointmentTaskDockList(queryDock);
+        FAppointmentTaskDock targetDock = dockList.stream()
+                .filter(d -> finalDockId.equals(d.getDockId()))
+                .filter(d -> d.getLoadingTaskCode() == null || d.getLoadingTaskCode().isEmpty())
+                .findFirst()
+                .orElse(null);
+
+        if (targetDock == null)
+        {
+            targetDock = dockList.stream()
+                    .sorted((a, b) -> {
+                        Long sortA = a.getDockSort() != null ? a.getDockSort() : 0L;
+                        Long sortB = b.getDockSort() != null ? b.getDockSort() : 0L;
+                        return sortA.compareTo(sortB);
+                    })
+                    .filter(d -> d.getLoadingTaskCode() == null || d.getLoadingTaskCode().isEmpty())
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (targetDock != null)
+        {
+            // 生成装卸任务编码
+            String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
+            String ltPrefix = "LT" + today;
+            String maxCode = fAppointmentTaskDockMapper.selectMaxLoadingTaskCodeByDate(ltPrefix);
+            int seq = 1;
+            if (maxCode != null && maxCode.length() > ltPrefix.length())
+            {
+                seq = Integer.parseInt(maxCode.substring(ltPrefix.length())) + 1;
+            }
+            targetDock.setLoadingTaskCode(ltPrefix + String.format("%04d", seq));
+            targetDock.setWorkStatus("0");
+
+            // 分配装卸点
+            FDockLoadingPoint queryPoint = new FDockLoadingPoint();
+            queryPoint.setDockId(dockId);
+            queryPoint.setStatus(1);
+            queryPoint.setIsOccupy("0");
+            queryPoint.setDeleted(0);
+            List<FDockLoadingPoint> freePoints = fDockLoadingPointService.selectFDockLoadingPointList(queryPoint);
+
+            if (freePoints != null && !freePoints.isEmpty())
+            {
+                FDockLoadingPoint point = freePoints.get(0);
+                point.setIsOccupy("1");
+                fDockLoadingPointService.updateFDockLoadingPoint(point);
+                targetDock.setLoadingPointId(point.getId());
+                targetDock.setLoadingPointCode(point.getLoadingPointCode());
+                targetDock.setLoadingPointName(point.getLoadingPointName());
+                targetDock.setQueueStatus("装卸点排队");
+                task.setTaskStatus("1");
+            }
+            else
+            {
+                // 分配停车位
+                FDockParkingSpace querySpace = new FDockParkingSpace();
+                querySpace.setDockId(dockId);
+                querySpace.setStatus(1);
+                querySpace.setIsOccupy("0");
+                querySpace.setDeleted(0);
+                List<FDockParkingSpace> freeSpaces = fDockParkingSpaceService.selectFDockParkingSpaceList(querySpace);
+                if (freeSpaces != null && !freeSpaces.isEmpty())
+                {
+                    FDockParkingSpace space = freeSpaces.get(0);
+                    space.setIsOccupy("1");
+                    fDockParkingSpaceService.updateFDockParkingSpace(space);
+                    targetDock.setParkingId(space.getId());
+                    targetDock.setParkingCode(space.getParkingSpaceCode());
+                    targetDock.setQueueStatus("停车位排队");
+                    Long maxQueue = fAppointmentTaskDockMapper.selectMaxQueueNumberByDockId(dockId);
+                    targetDock.setQueueNumber(maxQueue == null ? 1L : maxQueue + 1L);
+                    task.setTaskStatus("1");
+                }
+                else
+                {
+                    targetDock.setQueueStatus("厂外排队");
+                    Long maxQueue = fAppointmentTaskDockMapper.selectMaxQueueNumberByDockId(dockId);
+                    targetDock.setQueueNumber(maxQueue == null ? 1L : maxQueue + 1L);
+                    task.setTaskStatus("4");
+                }
+            }
+            fAppointmentTaskDockMapper.updateFAppointmentTaskDock(targetDock);
+        }
+        else
+        {
+            task.setTaskStatus("1");
+        }
+
+        fAppointmentTaskMapper.updateFAppointmentTask(task);
+        return AjaxResult.success("确认入厂成功");
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult missNumber(Long taskId)
+    {
+        FAppointmentTask task = fAppointmentTaskMapper.selectFAppointmentTaskById(taskId);
+        if (task == null)
+        {
+            return AjaxResult.error("任务不存在");
+        }
+        if (!"8".equals(task.getTaskStatus()))
+        {
+            return AjaxResult.error("只有叫号中状态才能过号");
+        }
+
+        int newMissCount = (task.getMissCount() == null ? 0 : task.getMissCount()) + 1;
+        task.setMissCount(newMissCount);
+
+        if (newMissCount >= 2)
+        {
+            // 过号2次，预约作废
+            task.setTaskStatus("9");
+            fAppointmentTaskMapper.updateFAppointmentTask(task);
+
+            // 释放定位设备
+            if (task.getDeviceId() != null)
+            {
+                FLocationDevice device = fLocationDeviceMapper.selectFLocationDeviceById(task.getDeviceId());
+                if (device != null)
+                {
+                    device.setDeviceStatus("idle");
+                    device.setTaskId(null);
+                    device.setTaskCode(null);
+                    fLocationDeviceMapper.updateFLocationDevice(device);
+                }
+            }
+            return AjaxResult.success("该任务已过号2次，预约已作废，需重新预约");
+        }
+
+        // 重新进入排队队列，顺延3位
+        // 保持原来的签到类型不变，通过修改queueEnterTime实现顺延
+        task.setTaskStatus("7");
+        task.setCallTime(null);
+        task.setAssignedDockId(null);
+        task.setAssignedDockName(null);
+        task.setDispatcherId(null);
+        task.setDispatcherName(null);
+
+        // 获取当前队列，计算插入位置（第4位）
+        List<FAppointmentTask> currentQueue = fAppointmentTaskMapper.selectGlobalQueueList();
+        if (currentQueue.size() >= 3)
+        {
+            FAppointmentTask thirdInQueue = currentQueue.get(2);
+            Date thirdTime = thirdInQueue.getQueueEnterTime() != null ? thirdInQueue.getQueueEnterTime() : thirdInQueue.getActualCheckinTime();
+            task.setQueueEnterTime(new Date(thirdTime.getTime() + 1));
+        }
+        else if (currentQueue.size() > 0)
+        {
+            FAppointmentTask lastInQueue = currentQueue.get(currentQueue.size() - 1);
+            Date lastTime = lastInQueue.getQueueEnterTime() != null ? lastInQueue.getQueueEnterTime() : lastInQueue.getActualCheckinTime();
+            task.setQueueEnterTime(new Date(lastTime.getTime() + 1));
+        }
+        else
+        {
+            task.setQueueEnterTime(new Date());
+        }
+
+        fAppointmentTaskMapper.updateFAppointmentTask(task);
+        return AjaxResult.success("过号处理完成，已重新排队");
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult processTimedOutCalls()
+    {
+        List<FAppointmentTask> timedOut = fAppointmentTaskMapper.selectTimedOutCallingTasks();
+        int processedCount = 0;
+        for (FAppointmentTask task : timedOut)
+        {
+            missNumber(task.getId());
+            processedCount++;
+        }
+        return AjaxResult.success("处理超时叫号完成，共处理" + processedCount + "条");
+    }
+
+    private String determineCheckinType(Date now, Date appointmentStart, Date appointmentEnd)
+    {
+        if (now.compareTo(appointmentStart) >= 0 && now.compareTo(appointmentEnd) <= 0)
+        {
+            return "normal";
+        }
+        else if (now.compareTo(appointmentEnd) > 0)
+        {
+            return "late";
+        }
+        else
+        {
+            return "early";
+        }
+    }
+
+    private Date calculateQueueEnterTime(String checkinType, Date actualCheckinTime, Date appointmentStart)
+    {
+        if ("early".equals(checkinType))
+        {
+            return appointmentStart;
+        }
+        return actualCheckinTime;
     }
 }

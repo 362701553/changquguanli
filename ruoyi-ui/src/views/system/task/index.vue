@@ -26,6 +26,9 @@
           <el-option label="待入厂" value="4" />
           <el-option label="待签出" value="5" />
           <el-option label="已结束" value="6" />
+          <el-option label="排队中" value="7" />
+          <el-option label="叫号中" value="8" />
+          <el-option label="已作废" value="9" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -72,11 +75,14 @@
     <el-tabs v-model="activeTab" @tab-click="handleTabClick" style="margin-bottom: 10px;">
       <el-tab-pane label="全部" name="all"></el-tab-pane>
       <el-tab-pane label="待签到" name="0"></el-tab-pane>
+      <el-tab-pane label="排队中" name="7"></el-tab-pane>
+      <el-tab-pane label="叫号中" name="8"></el-tab-pane>
       <el-tab-pane label="待入厂" name="4"></el-tab-pane>
       <el-tab-pane label="待作业" name="1"></el-tab-pane>
       <el-tab-pane label="作业中" name="2"></el-tab-pane>
       <el-tab-pane label="待签出" name="5"></el-tab-pane>
       <el-tab-pane label="已结束" name="6"></el-tab-pane>
+      <el-tab-pane label="已作废" name="9"></el-tab-pane>
     </el-tabs>
 
     <el-table v-loading="loading" :data="taskList" @selection-change="handleSelectionChange">
@@ -525,11 +531,11 @@ export default {
       }
     },
     statusText(status) {
-      const map = { '0': '待签到', '1': '待作业', '2': '作业中', '3': '已完成', '4': '待入厂', '5': '待签出', '6': '已结束' };
+      const map = { '0': '待签到', '1': '待作业', '2': '作业中', '3': '已完成', '4': '待入厂', '5': '待签出', '6': '已结束', '7': '排队中', '8': '叫号中', '9': '已作废' };
       return map[status] || '未知';
     },
     statusTagType(status) {
-      const map = { '0': 'info', '1': 'warning', '2': '', '3': 'success', '4': 'danger', '5': 'warning', '6': 'success' };
+      const map = { '0': 'info', '1': 'warning', '2': '', '3': 'success', '4': 'danger', '5': 'warning', '6': 'success', '7': '', '8': 'danger', '9': 'info' };
       return map[status] || 'info';
     },
     dockStatusText(status) {

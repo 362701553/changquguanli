@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FCheckinRateMapper">
+
+    <!-- 签到及时率统计列表（按司机分组） -->
+    <select id="selectCheckinRateList" resultType="java.util.Map">
+        SELECT
+            t.out_driver_name AS driverName,
+            t.out_driver_phone AS driverPhone,
+            COUNT(*) AS totalCount,
+            SUM(CASE WHEN t.actual_checkin_time IS NOT NULL AND t.actual_checkin_time &lt;= t.appointment_end THEN 1 ELSE 0 END) AS onTimeCount,
+            SUM(CASE WHEN t.actual_checkin_time IS NULL OR t.actual_checkin_time &gt; t.appointment_end THEN 1 ELSE 0 END) AS lateCount,
+            ROUND(
+                SUM(CASE WHEN t.actual_checkin_time IS NOT NULL AND t.actual_checkin_time &lt;= t.appointment_end THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+                1
+            ) AS onTimeRate
+        FROM f_appointment_task t
+        WHERE t.deleted = 0
+        <if test="appointmentDate != null and appointmentDate != ''">
+            AND DATE(t.appointment_start) = #{appointmentDate}
+        </if>
+        <if test="driverName != null and driverName != ''">
+            AND t.out_driver_name LIKE CONCAT('%', #{driverName}, '%')
+        </if>
+        GROUP BY t.out_driver_name, t.out_driver_phone
+        ORDER BY onTimeRate ASC
+    </select>
+
+    <!-- 签到及时率明细列表 -->
+    <select id="selectCheckinRateDetail" resultType="java.util.Map">
+        SELECT
+            t.id,
+            t.task_code AS taskCode,
+            t.out_driver_name AS outDriverName,
+            t.out_driver_phone AS outDriverPhone,
+            t.appointment_start AS appointmentStart,
+            t.appointment_end AS appointmentEnd,
+            t.actual_checkin_time AS checkinTime,
+            CASE
+                WHEN t.actual_checkin_time IS NOT NULL AND t.actual_checkin_time &lt;= t.appointment_end THEN '1'
+                ELSE '0'
+            END AS isOnTime,
+            t.task_status AS taskStatus,
+            (SELECT GROUP_CONCAT(d.dock_name SEPARATOR ',') FROM f_appointment_task_dock d WHERE d.task_id = t.id) AS dockNames
+        FROM f_appointment_task t
+        WHERE t.deleted = 0
+        <if test="appointmentDate != null and appointmentDate != ''">
+            AND DATE(t.appointment_start) = #{appointmentDate}
+        </if>
+        <if test="driverName != null and driverName != ''">
+            AND t.out_driver_name = #{driverName}
+        </if>
+        <if test="type == 'onTime'">
+            AND t.actual_checkin_time IS NOT NULL AND t.actual_checkin_time &lt;= t.appointment_end
+        </if>
+        <if test="type == 'late'">
+            AND (t.actual_checkin_time IS NULL OR t.actual_checkin_time &gt; t.appointment_end)
+        </if>
+        ORDER BY t.appointment_start DESC
+    </select>
+
+</mapper>

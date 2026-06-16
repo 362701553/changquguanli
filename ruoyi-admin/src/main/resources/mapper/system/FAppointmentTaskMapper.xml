@@ -71,10 +71,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark"    column="remark"    />
         <result property="reviewNotes"    column="review_notes"    />
         <result property="dockNames"    column="dock_names"    />
+        <result property="checkinType"    column="checkin_type"    />
+        <result property="callCount"    column="call_count"    />
+        <result property="missCount"    column="miss_count"    />
+        <result property="callTime"    column="call_time"    />
+        <result property="assignedDockId"    column="assigned_dock_id"    />
+        <result property="assignedDockName"    column="assigned_dock_name"    />
+        <result property="dispatcherId"    column="dispatcher_id"    />
+        <result property="dispatcherName"    column="dispatcher_name"    />
+        <result property="queueEnterTime"    column="queue_enter_time"    />
     </resultMap>
 
     <sql id="selectFAppointmentTaskVo">
-        select id, factory_id, factory_name, dept_id, deleted, create_by, create_date, update_by, update_date, task_code, factory_area_id, factory_area_name, category_main_code, category_sub_code, category_name, category_sub_name, business_liaison_by_id, business_liaison_by_rel, business_liaison_by, service_provider_id, service_provider_name, car_id, car_no, transport_pallets, out_driver_id, out_driver_name, out_driver_phone, task_status, expect_wait_time, checkin_gate_id, checkin_gate_name, plan_checkin_time, actual_checkin_time, plan_checkout_time, actual_checkout_time, checkout_gate_id, checkout_gate_name, appointment_start, appointment_end, appointment_time, audit_status, auditor, audit_time, audit_reject_reason, allow_jump, jump_reason, jump_operator, jump_time, exit_no, gate_id, gate_name, expect_driver_arrive_time, device_id, device_sn, bind_device_status, start_point, destination_point, plan_time_detail_id, current_dock_id, current_dock_name, bind_time, is_emergency, is_force_stop, remark, review_notes from f_appointment_task
+        select id, factory_id, factory_name, dept_id, deleted, create_by, create_date, update_by, update_date, task_code, factory_area_id, factory_area_name, category_main_code, category_sub_code, category_name, category_sub_name, business_liaison_by_id, business_liaison_by_rel, business_liaison_by, service_provider_id, service_provider_name, car_id, car_no, transport_pallets, out_driver_id, out_driver_name, out_driver_phone, task_status, expect_wait_time, checkin_gate_id, checkin_gate_name, plan_checkin_time, actual_checkin_time, plan_checkout_time, actual_checkout_time, checkout_gate_id, checkout_gate_name, appointment_start, appointment_end, appointment_time, audit_status, auditor, audit_time, audit_reject_reason, allow_jump, jump_reason, jump_operator, jump_time, exit_no, gate_id, gate_name, expect_driver_arrive_time, device_id, device_sn, bind_device_status, start_point, destination_point, plan_time_detail_id, current_dock_id, current_dock_name, bind_time, is_emergency, is_force_stop, remark, review_notes, checkin_type, call_count, miss_count, call_time, assigned_dock_id, assigned_dock_name, dispatcher_id, dispatcher_name, queue_enter_time from f_appointment_task
     </sql>
 
     <select id="selectFAppointmentTaskList" parameterType="FAppointmentTask" resultMap="FAppointmentTaskResult">
@@ -218,6 +227,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isForceStop != null">is_force_stop,</if>
             <if test="remark != null">remark,</if>
             <if test="reviewNotes != null">review_notes,</if>
+            <if test="checkinType != null">checkin_type,</if>
+            <if test="callCount != null">call_count,</if>
+            <if test="missCount != null">miss_count,</if>
+            <if test="callTime != null">call_time,</if>
+            <if test="assignedDockId != null">assigned_dock_id,</if>
+            <if test="assignedDockName != null">assigned_dock_name,</if>
+            <if test="dispatcherId != null">dispatcher_id,</if>
+            <if test="dispatcherName != null">dispatcher_name,</if>
+            <if test="queueEnterTime != null">queue_enter_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="factoryId != null">#{factoryId},</if>
@@ -284,6 +302,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isForceStop != null">#{isForceStop},</if>
             <if test="remark != null">#{remark},</if>
             <if test="reviewNotes != null">#{reviewNotes},</if>
+            <if test="checkinType != null">#{checkinType},</if>
+            <if test="callCount != null">#{callCount},</if>
+            <if test="missCount != null">#{missCount},</if>
+            <if test="callTime != null">#{callTime},</if>
+            <if test="assignedDockId != null">#{assignedDockId},</if>
+            <if test="assignedDockName != null">#{assignedDockName},</if>
+            <if test="dispatcherId != null">#{dispatcherId},</if>
+            <if test="dispatcherName != null">#{dispatcherName},</if>
+            <if test="queueEnterTime != null">#{queueEnterTime},</if>
          </trim>
     </insert>
 
@@ -354,6 +381,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isForceStop != null">is_force_stop = #{isForceStop},</if>
             <if test="remark != null">remark = #{remark},</if>
             <if test="reviewNotes != null">review_notes = #{reviewNotes},</if>
+            <if test="checkinType != null">checkin_type = #{checkinType},</if>
+            <if test="callCount != null">call_count = #{callCount},</if>
+            <if test="missCount != null">miss_count = #{missCount},</if>
+            <if test="callTime != null">call_time = #{callTime},</if>
+            <if test="assignedDockId != null">assigned_dock_id = #{assignedDockId},</if>
+            <if test="assignedDockName != null">assigned_dock_name = #{assignedDockName},</if>
+            <if test="dispatcherId != null">dispatcher_id = #{dispatcherId},</if>
+            <if test="dispatcherName != null">dispatcher_name = #{dispatcherName},</if>
+            <if test="queueEnterTime != null">queue_enter_time = #{queueEnterTime},</if>
         </trim>
         where id = #{id}
     </update>
@@ -376,9 +412,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectConflictingTask" resultMap="FAppointmentTaskResult">
         <include refid="selectFAppointmentTaskVo"/>
         WHERE out_driver_id = #{outDriverId}
-          AND task_status IN ('0','1','2','4','5')
+          AND task_status IN ('0','1','2','4','5','7','8')
           AND appointment_start &lt; #{appointmentEnd}
           AND appointment_end &gt; #{appointmentStart}
         LIMIT 1
+    </select>
+
+    <select id="selectGlobalQueueList" resultMap="FAppointmentTaskResult">
+        select t.*,
+            (select group_concat(d.dock_name separator ',') from f_appointment_task_dock d where d.task_id = t.id) as dock_names
+        from f_appointment_task t
+        where t.task_status = '7'
+          and (t.deleted is null or t.deleted = 0)
+        order by
+            case
+                when (t.checkin_type = 'early' and NOW() >= t.appointment_start) or t.checkin_type = 'normal' then 1
+                when t.checkin_type = 'late' then 2
+                when t.checkin_type = 'early' then 3
+                else 4
+            end asc,
+            t.queue_enter_time asc
+    </select>
+
+    <select id="selectTimedOutCallingTasks" resultMap="FAppointmentTaskResult">
+        <include refid="selectFAppointmentTaskVo"/>
+        where task_status = '8'
+          and call_time is not null
+          and TIMESTAMPDIFF(MINUTE, call_time, NOW()) >= 5
     </select>
 </mapper>

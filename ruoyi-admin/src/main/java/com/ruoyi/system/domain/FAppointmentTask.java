@@ -137,23 +137,23 @@ public class FAppointmentTask extends BaseEntity
     private String checkinGateName;
 
     /** 计划签入时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "计划签入时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "计划签入时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date planCheckinTime;
 
     /** 实际签入时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "实际签入时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "实际签入时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date actualCheckinTime;
 
     /** 计划签出时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "计划签出时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "计划签出时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date planCheckoutTime;
 
     /** 实际签出时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "实际签出时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "实际签出时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date actualCheckoutTime;
 
     /** 签出大门ID */
@@ -278,6 +278,44 @@ public class FAppointmentTask extends BaseEntity
     /** 审核备注 */
     @Excel(name = "审核备注")
     private String reviewNotes;
+
+    /** 签到类型: normal/late/early */
+    @Excel(name = "签到类型")
+    private String checkinType;
+
+    /** 被叫号次数 */
+    @Excel(name = "被叫号次数")
+    private Integer callCount;
+
+    /** 过号次数 */
+    @Excel(name = "过号次数")
+    private Integer missCount;
+
+    /** 最近叫号时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "最近叫号时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    private Date callTime;
+
+    /** 叫号分配码头ID */
+    @Excel(name = "叫号分配码头ID")
+    private Long assignedDockId;
+
+    /** 叫号分配码头名称 */
+    @Excel(name = "叫号分配码头名称")
+    private String assignedDockName;
+
+    /** 发货员ID */
+    @Excel(name = "发货员ID")
+    private Long dispatcherId;
+
+    /** 发货员名称 */
+    @Excel(name = "发货员名称")
+    private String dispatcherName;
+
+    /** 进入排队时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "进入排队时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    private Date queueEnterTime;
 
     /** 预约码头名称拼接（非持久化） */
     private String dockNames;
@@ -866,9 +904,99 @@ public class FAppointmentTask extends BaseEntity
         this.reviewNotes = reviewNotes;
     }
 
-    public String getReviewNotes() 
+    public String getReviewNotes()
     {
         return reviewNotes;
+    }
+
+    public void setCheckinType(String checkinType)
+    {
+        this.checkinType = checkinType;
+    }
+
+    public String getCheckinType()
+    {
+        return checkinType;
+    }
+
+    public void setCallCount(Integer callCount)
+    {
+        this.callCount = callCount;
+    }
+
+    public Integer getCallCount()
+    {
+        return callCount;
+    }
+
+    public void setMissCount(Integer missCount)
+    {
+        this.missCount = missCount;
+    }
+
+    public Integer getMissCount()
+    {
+        return missCount;
+    }
+
+    public void setCallTime(Date callTime)
+    {
+        this.callTime = callTime;
+    }
+
+    public Date getCallTime()
+    {
+        return callTime;
+    }
+
+    public void setAssignedDockId(Long assignedDockId)
+    {
+        this.assignedDockId = assignedDockId;
+    }
+
+    public Long getAssignedDockId()
+    {
+        return assignedDockId;
+    }
+
+    public void setAssignedDockName(String assignedDockName)
+    {
+        this.assignedDockName = assignedDockName;
+    }
+
+    public String getAssignedDockName()
+    {
+        return assignedDockName;
+    }
+
+    public void setDispatcherId(Long dispatcherId)
+    {
+        this.dispatcherId = dispatcherId;
+    }
+
+    public Long getDispatcherId()
+    {
+        return dispatcherId;
+    }
+
+    public void setDispatcherName(String dispatcherName)
+    {
+        this.dispatcherName = dispatcherName;
+    }
+
+    public String getDispatcherName()
+    {
+        return dispatcherName;
+    }
+
+    public void setQueueEnterTime(Date queueEnterTime)
+    {
+        this.queueEnterTime = queueEnterTime;
+    }
+
+    public Date getQueueEnterTime()
+    {
+        return queueEnterTime;
     }
 
     @Override

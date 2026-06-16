@@ -72,4 +72,14 @@ public interface FAppointmentTaskMapper
     public List<FAppointmentTask> selectConflictingTask(@Param("outDriverId") Long outDriverId,
                                                         @Param("appointmentStart") Date appointmentStart,
                                                         @Param("appointmentEnd") Date appointmentEnd);
+
+    /**
+     * 查询全局排队队列（按优先级排序）
+     */
+    public List<FAppointmentTask> selectGlobalQueueList();
+
+    /**
+     * 查询叫号超时的任务（超过5分钟未确认入厂）
+     */
+    public List<FAppointmentTask> selectTimedOutCallingTasks();
 }
